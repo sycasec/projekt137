@@ -15,28 +15,30 @@ class myClient:
         t_send = threading.Thread(target=self.sender)
         t_send.start()
 
-    def broadcast_receiver(self, expect_string=False):
+    def broadcast_receiver(self):
         while True:
-            s_msg = self.s.recv(1024)
+            s_msg_bin = self.s.recv(1024)
 
-            if expect_string:
-                print("Broadcast message received: ", s_msg.decode())       
-                continue
+            try:
+                s_msg = s_msg_bin.decode()
+            except UnicodeDecodeError:
+                s_msg = pickle.loads(s_msg_bin)
 
-            print("Broadcast message received: ", pickle.loads(s_msg))       
+            print("Broadcast message received: ", s_msg)       
 
 
-    def sender(self, data=None, expect_string=False):
+    def sender(self, data=None, data_is_string=False):
         if data is None:
             data = {"I am": "a dummy placeholder"}
 
-        if expect_string:
-            while True:
-                self.s.send(input("Input message to send: ").encode())        
-        else: 
-            while True:
+        while True:
+            if data_is_string:
+                data = input("Input message to send: ")
+                to_send = data.encode()
+            else:
                 input("Press enter to send data")
-                self.s.send(pickle.dumps(data))
+                to_send = pickle.dumps(data)
+            self.s.send(to_send)
 
 if __name__=="__main__":
     myClient()

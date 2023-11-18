@@ -40,21 +40,18 @@ class myServer:
     def __del__(self):
         self.server.close()
 
-    def clientHandler(self, conn, adr, expect_string=False):
+    def clientHandler(self, conn, adr):
         while True:
+            c_msg_bin = conn.recv(1024)
+            try:
+                # Decode string
+                c_msg = c_msg_bin.decode()
+            except UnicodeDecodeError:
+                # Decode data object
+                c_msg = pickle.loads(c_msg_bin)
 
-            if expect_string:
-                c_messg_bin = conn.recv(1024)
-                # Convert binary data to string
-                c_messg = c_messg_bin.decode()
-                print(adr,": message from client: ",c_messg)
-                self.broadcast(c_messg_bin)
-                continue
-
-            c_data_bin =conn.recv(1024)
-            # Convert binary data to Python object
-            c_data = pickle.loads(c_data_bin)
-            self.broadcast(c_data)
+            print(f"message from {adr}: {c_msg}")
+            self.broadcast(c_msg_bin)
 
     def broadcast(self,message):
         for conn in self.clientList:
