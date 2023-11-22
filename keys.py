@@ -9,14 +9,13 @@ class Key:
     key_rect_size = 60
     b_rad = 3 
 
-    def __init__(self, assigned_key, coords, t_font, key_code):
+    def __init__(self, assigned_key, coords, t_font):
         self.key = assigned_key
         self.x = coords[0]
         self.y = coords[1] 
         self.color = self.key_default_color
         self.target_color = self.key_default_color
         self.t_timer = 0
-        self.key_code = key_code
         self.font = t_font
 
     def toggle_red(self):
@@ -95,7 +94,7 @@ class KeyHelper:
 
         for char in sel_row:
             key_code = pygame.K_a + (ord(char.upper()) - ord('A'))
-            kd[char] = Key(char, (c_x, self.y_vals[row]), self.font, key_code)
+            kd[key_code] = Key(char, (c_x, self.y_vals[row]), self.font)
             c_x += self.x_inc
 
         return kd

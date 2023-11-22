@@ -2,7 +2,7 @@
 
 import pygame
 
-from keys import Key, KeyHelper
+from keys import KeyHelper
 from background import Background
 from network.client import myClient
 
@@ -54,10 +54,11 @@ while True:
             exit()
     # --------------------------------- EXPERIMENTAL --------------------------------
         elif event.type == pygame.KEYDOWN:
-            # TODO: turn this into a dict lookup instead of a loop
-            for key in k_dict.values():
-                if event.key == key.key_code:
-                    c.send(key.key)
+            try: 
+                k_dict[event.key].on_key_press()
+                c.send(k_dict[event.key])
+            except KeyError as e:
+                print(f"KeyError: {e}")
     # --------------------------------- EXPERIMENTAL --------------------------------
 
     for k in k_dict.values():
