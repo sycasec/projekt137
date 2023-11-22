@@ -20,8 +20,8 @@ pygame.display.set_caption(WINDOW_TITLE)
 h1_size: int = 50
 
 # I dont have DM sans installed yet.
-h1_dm_sans = pygame.font.Font("InterNerdFontPropo-Bold.otf", h1_size)
-keys_font = pygame.font.Font("InterNerdFontPropo-Bold.otf",36)
+h1_dm_sans = pygame.font.Font(pygame.font.get_default_font(), h1_size)
+keys_font = pygame.font.Font(pygame.font.get_default_font(),36)
 
 # Temporary Text Surfaces 
 title_surface = h1_dm_sans.render("KEYBOARD SPLATOON", True, "Black")
