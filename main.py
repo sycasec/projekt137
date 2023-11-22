@@ -4,6 +4,7 @@ import pygame
 
 from keys import Key, KeyHelper
 from background import Background
+from network.client import myClient
 
 WINDOW_WIDTH = 1125 
 WINDOW_HEIGHT = 800 
@@ -35,6 +36,16 @@ keys = KeyHelper(keys_font)
 keys.gen_keys()
 k_dict = keys.get_keys()
 
+# Network actions
+def receive_keypress(key):
+    print(f"Broadcast received: {key}")
+    try:
+        k_dict[key].on_key_press()
+    except KeyError:
+        pass
+
+c = myClient(on_receive=receive_keypress)
+
 # main loop
 while True:
     for event in pygame.event.get():
@@ -43,9 +54,10 @@ while True:
             exit()
     # --------------------------------- EXPERIMENTAL --------------------------------
         elif event.type == pygame.KEYDOWN:
+            # TODO: turn this into a dict lookup instead of a loop
             for key in k_dict.values():
                 if event.key == key.key_code:
-                    key.on_key_press()
+                    c.send(key.key)
     # --------------------------------- EXPERIMENTAL --------------------------------
 
     for k in k_dict.values():
@@ -59,4 +71,5 @@ while True:
 
     pygame.display.update()
     GAME_CLOCK.tick(60)
+
 
