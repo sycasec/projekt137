@@ -2,8 +2,8 @@
 
 import pygame
 
-from keys import KeyHelper
-from background import Background
+from components.keys import KeyHelper
+from components.background import Background
 from network.client import myClient
 
 WINDOW_WIDTH = 1125 
