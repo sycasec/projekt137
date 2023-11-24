@@ -55,8 +55,7 @@ while True:
     # --------------------------------- EXPERIMENTAL --------------------------------
         elif event.type == pygame.KEYDOWN:
             try: 
-                k_dict[event.key].on_key_press()
-                c.send(k_dict[event.key])
+                c.send(k_dict[event.key].key)
             except KeyError as e:
                 print(f"KeyError: {e}")
     # --------------------------------- EXPERIMENTAL --------------------------------
