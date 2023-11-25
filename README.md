@@ -9,5 +9,13 @@ CMSC 137 Final Project
 
 Keyboard Splatoon - connect via local network with your friends and play a 1v1 battle
 
+# Installation and Setup
+1. Run the following snippet to start the game server
+```python network/server.py```
+2. In a separate tab, run the following snippet to start the game on your machine
+```python main.py```
+3. On another machine, rune the following snippet to connect to the host server
+```python main.py```
+
 ## Screenshots
 
