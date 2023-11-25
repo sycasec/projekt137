@@ -24,7 +24,7 @@ class ScoreHelper:
 
     def __init__(self, score_font):
         self.font = score_font
-        self.x_val = 512
+        self.x_center = 562 # coordinate for CENTER of the scores, NOT the left
         self.y_val = 300
         self.x_inc = 100
         self.scores = self.gen_scores()
@@ -33,7 +33,7 @@ class ScoreHelper:
         self.scores[player].add_score(amount)
 
     def gen_scores(self):
-        x = self.x_val
+        x = self.x_center - self.x_inc
         y = self.y_val
 
         scores = {}
