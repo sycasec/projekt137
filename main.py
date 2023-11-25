@@ -11,6 +11,7 @@ WINDOW_HEIGHT = 800
 FACTOR = 25
 WINDOW_TITLE = "Keyboard Splatoon"
 GAME_CLOCK = pygame.time.Clock()
+SCORES = {"R":0, "G":0}
 
 pygame.init()
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -40,7 +41,15 @@ k_dict = keys.get_keys()
 def receive_keypress(key):
     print(f"Broadcast received: {key}")
     try:
-        k_dict[key].on_key_press()
+        key_obj = k_dict[key]
+        key_obj.on_key_press()
+        if key_obj.target_color == key_obj.key_green_color:
+            to_add = "G"
+        elif key_obj.target_color == key_obj.key_red_color:
+            to_add = "R"
+        SCORES[to_add] += 10
+
+        print(SCORES)
     except KeyError:
         pass
 
