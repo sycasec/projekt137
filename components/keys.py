@@ -1,4 +1,5 @@
 import pygame
+import random
 
 class Key:
     t_speed = 0.005
@@ -13,8 +14,9 @@ class Key:
         self.key = assigned_key
         self.x = coords[0]
         self.y = coords[1] 
-        self.color = self.key_default_color
-        self.target_color = self.key_default_color
+        start_color = self.random_color()
+        self.color = start_color
+        self.target_color = start_color
         self.t_timer = 0
         self.font = t_font
 
@@ -23,6 +25,9 @@ class Key:
 
     def toggle_green(self):
         self.target_color = self.key_green_color
+
+    def random_color(self):
+        return random.choice((self.key_red_color, self.key_green_color))
 
     def on_key_press(self):
         self.t_timer = pygame.time.get_ticks()
