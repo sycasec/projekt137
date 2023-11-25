@@ -2,7 +2,7 @@
 
 import pygame
 
-from components.keys import KeyHelper
+from components.keys import Key, KeyHelper
 from components.background import Background
 from components.score import ScoreHelper
 from network.client import myClient
@@ -91,4 +91,14 @@ while True:
     pygame.display.update()
     GAME_CLOCK.tick(60)
 
-
+    # End the game if all keys are the same color as "A" key
+    if all(
+        key.target_color == Key.key_green_color 
+        for key in k_dict.values()
+        ) or all(
+            key.target_color == Key.key_red_color 
+            for key in k_dict.values()
+        ):
+        # TODO: REPLACE THIS WITH SOME "GAME OVER" SCREEN!
+        # THIS WILL JUST FREEZE THE SCREEN ON THE LAST FRAME
+        break
