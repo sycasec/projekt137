@@ -31,7 +31,7 @@ class GameOver:
             event.type == pygame.MOUSEBUTTONDOWN
             or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE)
         ):
-            return "home"
+            return "rematch"
 
 
     def render(self, screen, winner):

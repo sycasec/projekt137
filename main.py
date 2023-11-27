@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import pygame
+import random
 
 from components.keys import Key, KeyHelper
 from components.background import Background
@@ -174,10 +175,16 @@ while True:
         # TODO: IMPORTANT! Find a way to kill the client and server before continuing
         gameover_screen.render(screen, winner)
         gameover_result = gameover_screen.handle_event(event)
-        if gameover_result == "home":
-            active_screen = "home"
+        if gameover_result == "rematch":
+            scores.reset_scores()   # Generate new starting colors
+            new_colors = list(("R" * 13) + ("G" * 13))
+            random.shuffle(new_colors)
+            new_colors = "".join(new_colors)
+            keys.set_key_colors_from_string(new_colors)
+            c.send(new_colors.encode())
+
+            active_screen = "play"
 
 
     pygame.display.update()
     GAME_CLOCK.tick(60)
-
