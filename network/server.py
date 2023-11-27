@@ -19,6 +19,13 @@ class myServer:
         self.server.listen(1)
 
         #Functions to run the server
+        self.serverLoop = threading.Thread(target=self.mainLoop)
+        self.serverLoop.start()
+
+    def __del__(self):
+        self.server.close()
+
+    def mainLoop(self):
         try:
             while True:
                 print("Waiting for client")
@@ -36,10 +43,6 @@ class myServer:
         finally:
             if self.server:
                 self.server.close()
-
-    def __del__(self):
-        self.server.close()
-
     def clientHandler(self, conn, adr):
         while True:
             c_msg_bin = conn.recv(1024)
