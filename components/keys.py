@@ -26,6 +26,9 @@ class Key:
     def toggle_green(self):
         self.target_color = self.key_green_color
 
+    def toggle_default(self):
+        self.target_color = self.key_default_color
+
     def random_color(self):
         return random.choice((self.key_red_color, self.key_green_color))
 
@@ -110,3 +113,37 @@ class KeyHelper:
 
     def get_keys(self):
         return self.keys_dict
+    
+    def get_key_colors(self):
+        """Generates a string representing the colors of all 26 keys on the keyboard
+
+        R = red
+        G = green
+        D = default
+
+        Returns:
+            string: 26-character long string of colors
+        """
+        result = ""
+        for letter in range(pygame.K_a, pygame.K_z + 1):
+            key = self.keys_dict[letter]
+            if key.target_color == Key.key_red_color:
+                color = "R"
+            elif key.target_color == Key.key_green_color:
+                color = "G"
+            else:
+                color = "D"
+            result += color
+        return result
+
+    def set_key_colors_from_string(self, s):
+        for i in range(len(s)):
+            self.keys_dict[pygame.K_a + i].t_timer = pygame.time.get_ticks() # IDK what this like does but if you remove it, the colors don't change
+            char = s[i]
+            if char == "R":
+                self.keys_dict[pygame.K_a + i].toggle_red()
+            elif char == "G":
+                self.keys_dict[pygame.K_a + i].toggle_green()
+            else:
+                self.keys_dict[pygame.K_a + i].toggle_default()
+

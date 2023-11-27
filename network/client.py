@@ -1,6 +1,7 @@
 import pickle
 import socket
 import threading
+import pygame
 
 class myClient:    
     def __init__(self, 
@@ -35,6 +36,42 @@ class myClient:
         except AttributeError:
             to_send = pickle.dumps(data)
         self.s.send(to_send)
+
+class GameClient(myClient):
+    def __init__(self, 
+                 receive_keypress,
+                 receive_keyboard_state,
+                 host="localhost", 
+                 port=7634, 
+                 on_receive=None
+                 ):
+        self.receive_keypress = receive_keypress
+        self.receive_keyboard_state = receive_keyboard_state
+
+        if on_receive is None:
+            on_receive = self.receive_broadcast
+
+        super().__init__(host, port, on_receive)
+
+
+    def receive_broadcast(self, msg):
+        print(f"Broadcast received: {msg}")
+        if self.__msg_is_keypress(msg):
+            self.receive_keypress(msg)
+
+        elif self.__msg_is_keyboard_state(msg):
+            self.receive_keyboard_state(msg.decode())
+
+    @staticmethod
+    def __msg_is_keypress(msg):
+        return isinstance(msg, int) and  pygame.K_a <= msg <= pygame.K_z
+    
+    @staticmethod
+    def __msg_is_keyboard_state(msg):
+        try: 
+            return len(msg) == 26
+        except:
+            return False
 
 if __name__=="__main__":
     myClient()
