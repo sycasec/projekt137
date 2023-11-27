@@ -89,7 +89,7 @@ while True:
             exit()
         elif event.type == pygame.KEYDOWN:
             # --------------------------------- EXPERIMENTAL --------------------------------
-            if event.key in k_dict:
+            if active_screen == "play" and event.key in k_dict:
                 try:
                     c.send(event.key)
                 except Exception as e:
