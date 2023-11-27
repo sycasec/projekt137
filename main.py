@@ -12,6 +12,7 @@ from screens.about import AboutScreen
 from screens.loading import Waiting
 from screens.assignment import ColorAssignment
 from screens.countdown import Countdown
+from screens.gameover import GameOver
 
 WINDOW_WIDTH = 1125
 WINDOW_HEIGHT = 800
@@ -74,6 +75,7 @@ about_screen = AboutScreen(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 waiting_screen = Waiting(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 assignment_screen = ColorAssignment(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 countdown_screen = Countdown(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
+gameover_screen = GameOver(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 active_screen = "home"
 
 
@@ -139,6 +141,20 @@ while True:
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             active_screen = "home"
 
+        # End the game if all keys are the same color
+        if all(
+            key.target_color == Key.key_green_color 
+            for key in k_dict.values()
+            ):
+            active_screen = "gameover"
+            winner = "GREEN"
+        if all(
+                key.target_color == Key.key_red_color 
+                for key in k_dict.values()
+            ):
+            active_screen = "gameover"
+            winner = "RED"
+
     elif active_screen == "about":
         about_screen.render(screen)
 
@@ -154,18 +170,14 @@ while True:
         if countdown_screen.is_complete():
             active_screen = "play"
 
+    elif active_screen == "gameover":
+        # TODO: IMPORTANT! Find a way to kill the client and server before continuing
+        gameover_screen.render(screen, winner)
+        gameover_result = gameover_screen.handle_event(event)
+        if gameover_result == "home":
+            active_screen = "home"
+
 
     pygame.display.update()
     GAME_CLOCK.tick(60)
 
-    # End the game if all keys are the same color as "A" key
-    if all(
-        key.target_color == Key.key_green_color 
-        for key in k_dict.values()
-        ) or all(
-            key.target_color == Key.key_red_color 
-            for key in k_dict.values()
-        ):
-        # TODO: REPLACE THIS WITH SOME "GAME OVER" SCREEN!
-        # THIS WILL JUST FREEZE THE SCREEN ON THE LAST FRAME
-        break
