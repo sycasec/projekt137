@@ -69,6 +69,7 @@ def receive_keypress(key):
     scores.add_score(to_add)
 
 def receive_keyboard_state(s):
+    scores.reset_scores()
     keys.set_key_colors_from_string(s)
 
 home_screen = HomeScreen(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
