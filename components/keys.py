@@ -137,13 +137,20 @@ class KeyHelper:
         return result
 
     def set_key_colors_from_string(self, s):
+        """Takes a 26-letter string consisting of "R", and "G", then updates the keyboard colors to match the string
+
+
+        Args:
+            s (str): 26-letter string representing the color of each letter in alphabetical order
+        """
         for i in range(len(s)):
-            self.keys_dict[pygame.K_a + i].t_timer = pygame.time.get_ticks() # IDK what this like does but if you remove it, the colors don't change
+            key = self.keys_dict[pygame.K_a + i]
+            key.t_timer = pygame.time.get_ticks() # IDK what this line does but if you remove it, the colors don't change
             char = s[i]
             if char == "R":
-                self.keys_dict[pygame.K_a + i].toggle_red()
+                key.toggle_red()
             elif char == "G":
-                self.keys_dict[pygame.K_a + i].toggle_green()
+                key.toggle_green()
             else:
-                self.keys_dict[pygame.K_a + i].toggle_default()
+                key.toggle_default()
 
