@@ -5,7 +5,7 @@ import pygame
 from components.keys import KeyHelper
 from components.background import Background
 from components.score import ScoreHelper
-from network.client import myClient
+from network.client import GameClient
 from network.server import myServer
 from screens.home import HomeScreen
 from screens.about import AboutScreen
@@ -50,7 +50,6 @@ scores = ScoreHelper(score_font)
 
 # Network actions
 def receive_keypress(key):
-    print(f"Broadcast received: {key}")
     try:
         key_obj = k_dict[key]
     except KeyError:
@@ -66,6 +65,9 @@ def receive_keypress(key):
     elif key_obj.target_color == key_obj.key_red_color:
         to_add = scores.RED
     scores.add_score(to_add)
+
+def receive_keyboard_state(s):
+    keys.set_key_colors_from_string(s)
 
 home_screen = HomeScreen(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 about_screen = AboutScreen(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
@@ -93,10 +95,17 @@ while True:
         if result is not None:
             if result == 0:  # initialize a game button
                 s = myServer()
-                c = myClient(on_receive=receive_keypress)
+                c = GameClient(
+                    receive_keypress=receive_keypress,
+                    receive_keyboard_state=receive_keyboard_state
+                )
                 active_screen = "play"
             elif result == 1:  # join a game button
-                c = myClient(on_receive=receive_keypress)
+                c = GameClient(
+                    receive_keypress=receive_keypress,
+                    receive_keyboard_state=receive_keyboard_state
+                )
+                c.send(keys.get_key_colors().encode()) # Synchronize everyone's keyboard colors to ours
                 active_screen = "load"
             elif result == 2:  # About button
                 active_screen = "about"
