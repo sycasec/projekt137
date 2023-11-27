@@ -138,6 +138,7 @@ class KeyHelper:
 
     def set_key_colors_from_string(self, s):
         for i in range(len(s)):
+            self.keys_dict[pygame.K_a + i].t_timer = pygame.time.get_ticks() # IDK what this like does but if you remove it, the colors don't change
             char = s[i]
             if char == "R":
                 self.keys_dict[pygame.K_a + i].toggle_red()
