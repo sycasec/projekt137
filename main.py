@@ -5,14 +5,15 @@ import pygame
 from components.keys import KeyHelper
 from components.background import Background
 from network.client import myClient
+from network.server import myServer
 from screens.home import HomeScreen
 from screens.about import AboutScreen
 from screens.loading import Waiting
 from screens.assignment import ColorAssignment
 from screens.countdown import Countdown
 
-WINDOW_WIDTH = 1125 
-WINDOW_HEIGHT = 800 
+WINDOW_WIDTH = 1125
+WINDOW_HEIGHT = 800
 FACTOR = 25
 WINDOW_TITLE = "Keyboard Splatoon"
 GAME_CLOCK = pygame.time.Clock()
@@ -22,14 +23,14 @@ screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption(WINDOW_TITLE)
 
 
-# Temporary Fonts 
+# Temporary Fonts
 h1_size: int = 50
 
 # I dont have DM sans installed yet.
 h1_dm_sans = pygame.font.Font(pygame.font.get_default_font(), h1_size)
 keys_font = pygame.font.Font(pygame.font.get_default_font(),36)
 
-# Temporary Text Surfaces 
+# Temporary Text Surfaces
 title_surface = h1_dm_sans.render("KEYBOARD SPLATOON", True, "Black")
 
 # Surfaces
@@ -49,7 +50,6 @@ def receive_keypress(key):
     except KeyError:
         pass
 
-c = myClient(on_receive=receive_keypress)
 home_screen = HomeScreen(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 about_screen = AboutScreen(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 waiting_screen = Waiting(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
@@ -71,12 +71,15 @@ while True:
                     c.send(event.key)
                 except Exception as e:
                     print("Something went wrong when sending your keypress")
-            # --------------------------------- EXPERIMENTAL --------------------------------        
+            # --------------------------------- EXPERIMENTAL --------------------------------
         result = home_screen.handle_event(event)
         if result is not None:
             if result == 0:  # initialize a game button
+                s = myServer()
+                c = myClient(on_receive=receive_keypress)
                 active_screen = "play"
             elif result == 1:  # join a game button
+                c = myClient(on_receive=receive_keypress)
                 active_screen = "load"
             elif result == 2:  # About button
                 active_screen = "about"
@@ -96,7 +99,7 @@ while True:
 
     if active_screen == "home":
         home_screen.render(screen)
-        
+
     elif active_screen == "play":
         for k in k_dict.values():
             k.update_color()
@@ -118,7 +121,7 @@ while True:
         result = waiting_screen.handle_event(event)
         if result == "assignment":
             active_screen = "assignment"
-            
+
     elif active_screen == "countdown":
         countdown_screen.render(screen)
         if countdown_screen.is_complete():
