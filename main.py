@@ -66,10 +66,11 @@ while True:
             exit()
         elif event.type == pygame.KEYDOWN:
             # --------------------------------- EXPERIMENTAL --------------------------------
-                try: 
-                    c.send(k_dict[event.key].key)
-                except KeyError as e:
-                    print(f"KeyError: {e}")
+            if event.key in k_dict:
+                try:
+                    c.send(event.key)
+                except Exception as e:
+                    print("Something went wrong when sending your keypress")
             # --------------------------------- EXPERIMENTAL --------------------------------        
         result = home_screen.handle_event(event)
         if result is not None:
