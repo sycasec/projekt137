@@ -93,19 +93,19 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-        # elif event.type == pygame.KEYDOWN:
-        #     # --------------------------------- EXPERIMENTAL --------------------------------
-        #     if event.key in k_dict:
-        #         try:
-        #             c.send(event.key)
-        #         except Exception as e:
-        #             print(f"Something went wrong when sending your keypress: {e}")
-        #     # --------------------------------- EXPERIMENTAL --------------------------------
+
+        elif active_screen == "play":
+            if event.type == pygame.KEYDOWN:
+                if event.key in k_dict:
+                    try:
+                        # c.send(event.key)
+                        k_dict[event.key].on_key_press()
+                    except Exception as e:
+                        print(f"Something went wrong when sending your keypress: {e}")
 
         
         # HOME SCREEN
         elif active_screen == "home":
-            home_screen.render(screen)
             result = home_screen.handle_event(event)
             if result is not None:
                 if result == 0:  # initialize a game button
@@ -129,60 +129,61 @@ while True:
                     exit()
 
 
-        # ABOUT SCREEN
-        elif active_screen == "about":
-            about_screen.render(screen)
-            about_result = about_screen.handle_event(event)
-            if about_result == "back":
-                active_screen = "home"
+    if active_screen == "home":
+        home_screen.render(screen)
+
+    # PLAY SCREEN
+    elif active_screen == "play":
+        for k in k_dict.values():
+            k.update_color()
+
+        screen.blit(bg, (0, 0))
+        screen.blit(title_surface, (290, 139))
+
+        dt = GAME_CLOCK.tick(60) / 1000.0 
+        timer_bar.update(dt)
+        timer_bar.draw(screen)
+        scores.draw(screen)
+        
+        for k in k_dict.values():
+            k.draw(screen)
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            active_screen = "home"
 
 
-        # ASSIGNMENT SCREEN
-        elif active_screen == "assignment":
-            assignment_screen.render(screen)
-            result = assignment_screen.handle_event(event)
-            if result == "countdown":
-                active_screen = "countdown"
-                countdown_screen.start_countdown()
+    # ABOUT SCREEN
+    elif active_screen == "about":
+        about_screen.render(screen)
+        about_result = about_screen.handle_event(event)
+        if about_result == "back":
+            active_screen = "home"
 
 
-        # PLAY SCREEN
-        elif active_screen == "play":
-            for k in k_dict.values():
-                k.update_color()
-
-            screen.blit(bg, (0, 0))
-            screen.blit(title_surface, (290, 139))
-
-            scores.draw(screen)
-            for k in k_dict.values():
-                k.draw(screen)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                active_screen = "home"
+    # ASSIGNMENT SCREEN
+    elif active_screen == "assignment":
+        assignment_screen.render(screen)
+        result = assignment_screen.handle_event(event)
+        if result == "countdown":
+            active_screen = "countdown"
+            countdown_screen.start_countdown()
 
 
         # LOAD SCREEN
-        elif active_screen == "load":
-            waiting_screen.update()
-            waiting_screen.render(screen)
-            result = waiting_screen.handle_event(event)
-            if result == "assignment":
-                active_screen = "assignment"
+    elif active_screen == "load":
+        waiting_screen.update()
+        waiting_screen.render(screen)
+        result = waiting_screen.handle_event(event)
+        if result == "assignment":
+            active_screen = "assignment"
 
 
-        # COUNTDOWN SCREEN
-        elif active_screen == "countdown":
-            countdown_screen.render(screen)
-            if countdown_screen.is_complete():
-                active_screen = "play"
-
-    # MERGE CONFLICT
-    # for k in k_dict.values():
-    #     k.draw(screen)
+    # COUNTDOWN SCREEN
+    elif active_screen == "countdown":
+        countdown_screen.render(screen)
+        if countdown_screen.is_complete():
+            active_screen = "play"    
     
-    # dt = GAME_CLOCK.tick(60) / 1000.0 
-    # timer_bar.update(dt)
-    # timer_bar.draw(screen)
+    
 
     pygame.display.update()
     GAME_CLOCK.tick(60)
