@@ -3,7 +3,7 @@ import random
 
 class Key:
     t_speed = 0.005
-    t_duration = 1000
+    t_duration = 100
     key_red_color = pygame.Color(224,102,102) 
     key_green_color = pygame.Color(147,196,125) 
     key_default_color = pygame.Color(199,199,199)

@@ -65,6 +65,8 @@ def receive_keypress(key):
     # will get multiple points per color toggle. 
     # Ex. scores are 200-150, even if you just spammed Q there's a slight bias to green
     # This can be seemingly fixed by reducing Key.t_duration to 100
+
+    to_add = 0
     if key_obj.target_color == key_obj.key_green_color:
         to_add = scores.GREEN
     elif key_obj.target_color == key_obj.key_red_color:
@@ -74,11 +76,14 @@ def receive_keypress(key):
 def receive_keyboard_state(s):
     keys.set_key_colors_from_string(s)
 
+
+# Screens 
 home_screen = HomeScreen(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 about_screen = AboutScreen(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 waiting_screen = Waiting(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 assignment_screen = ColorAssignment(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 countdown_screen = Countdown(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
+
 active_screen = "home"
 
 
@@ -88,39 +93,51 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-        elif event.type == pygame.KEYDOWN:
-            # --------------------------------- EXPERIMENTAL --------------------------------
-            if event.key in k_dict:
-                try:
-                    c.send(event.key)
-                except Exception as e:
-                    print("Something went wrong when sending your keypress")
-            # --------------------------------- EXPERIMENTAL --------------------------------
-        result = home_screen.handle_event(event)
-        if result is not None:
-            if result == 0:  # initialize a game button
-                s = myServer()
-                c = GameClient(
-                    receive_keypress=receive_keypress,
-                    receive_keyboard_state=receive_keyboard_state
-                )
-                active_screen = "play"
-            elif result == 1:  # join a game button
-                c = GameClient(
-                    receive_keypress=receive_keypress,
-                    receive_keyboard_state=receive_keyboard_state
-                )
-                c.send(keys.get_key_colors().encode()) # Synchronize everyone's keyboard colors to ours
-                active_screen = "load"
-            elif result == 2:  # About button
-                active_screen = "about"
-            elif result == 3:  # Quit button
-                pygame.quit()
-                exit()
+        # elif event.type == pygame.KEYDOWN:
+        #     # --------------------------------- EXPERIMENTAL --------------------------------
+        #     if event.key in k_dict:
+        #         try:
+        #             c.send(event.key)
+        #         except Exception as e:
+        #             print(f"Something went wrong when sending your keypress: {e}")
+        #     # --------------------------------- EXPERIMENTAL --------------------------------
+
+        
+        # HOME SCREEN
+        elif active_screen == "home":
+            home_screen.render(screen)
+            result = home_screen.handle_event(event)
+            if result is not None:
+                if result == 0:  # initialize a game button
+                    s = myServer()
+                    c = GameClient(
+                        receive_keypress=receive_keypress,
+                        receive_keyboard_state=receive_keyboard_state
+                    )
+                    active_screen = "play"
+                elif result == 1:  # join a game button
+                    c = GameClient(
+                        receive_keypress=receive_keypress,
+                        receive_keyboard_state=receive_keyboard_state
+                    )
+                    c.send(keys.get_key_colors().encode()) # Synchronize everyone's keyboard colors to ours
+                    active_screen = "load"
+                elif result == 2:  # About button
+                    active_screen = "about"
+                elif result == 3:  # Quit button
+                    pygame.quit()
+                    exit()
+
+
+        # ABOUT SCREEN
         elif active_screen == "about":
+            about_screen.render(screen)
             about_result = about_screen.handle_event(event)
             if about_result == "back":
                 active_screen = "home"
+
+
+        # ASSIGNMENT SCREEN
         elif active_screen == "assignment":
             assignment_screen.render(screen)
             result = assignment_screen.handle_event(event)
@@ -128,36 +145,36 @@ while True:
                 active_screen = "countdown"
                 countdown_screen.start_countdown()
 
-    if active_screen == "home":
-        home_screen.render(screen)
 
-    elif active_screen == "play":
-        for k in k_dict.values():
-            k.update_color()
+        # PLAY SCREEN
+        elif active_screen == "play":
+            for k in k_dict.values():
+                k.update_color()
 
-        screen.blit(bg, (0, 0))
-        screen.blit(title_surface, (290, 139))
+            screen.blit(bg, (0, 0))
+            screen.blit(title_surface, (290, 139))
 
-        scores.draw(screen)
-        for k in k_dict.values():
-            k.draw(screen)
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            active_screen = "home"
+            scores.draw(screen)
+            for k in k_dict.values():
+                k.draw(screen)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                active_screen = "home"
 
-    elif active_screen == "about":
-        about_screen.render(screen)
 
-    elif active_screen == "load":
-        waiting_screen.update()
-        waiting_screen.render(screen)
-        result = waiting_screen.handle_event(event)
-        if result == "assignment":
-            active_screen = "assignment"
+        # LOAD SCREEN
+        elif active_screen == "load":
+            waiting_screen.update()
+            waiting_screen.render(screen)
+            result = waiting_screen.handle_event(event)
+            if result == "assignment":
+                active_screen = "assignment"
 
-    elif active_screen == "countdown":
-        countdown_screen.render(screen)
-        if countdown_screen.is_complete():
-            active_screen = "play"
+
+        # COUNTDOWN SCREEN
+        elif active_screen == "countdown":
+            countdown_screen.render(screen)
+            if countdown_screen.is_complete():
+                active_screen = "play"
 
     # MERGE CONFLICT
     # for k in k_dict.values():
