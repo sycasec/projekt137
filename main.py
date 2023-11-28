@@ -4,6 +4,8 @@ import pygame
 
 from components.keys import KeyHelper
 from components.background import Background
+from network.client import myClient
+from components.timer import Timer
 from components.score import ScoreHelper
 from network.client import GameClient
 from network.server import myServer
@@ -39,6 +41,9 @@ title_surface = h1_dm_sans.render("KEYBOARD SPLATOON", True, "Black")
 # Surfaces
 bg = Background([WINDOW_WIDTH, WINDOW_HEIGHT]).generate("White")
 
+# Timer
+timer_font = pygame.font.Font(pygame.font.get_default_font(), 20)
+timer_bar = Timer(50, 50, (WINDOW_WIDTH-200), 10, timer_font)
 
 # Key generation
 keys = KeyHelper(keys_font)
@@ -154,6 +159,13 @@ while True:
         if countdown_screen.is_complete():
             active_screen = "play"
 
+    # MERGE CONFLICT
+    # for k in k_dict.values():
+    #     k.draw(screen)
+    
+    # dt = GAME_CLOCK.tick(60) / 1000.0 
+    # timer_bar.update(dt)
+    # timer_bar.draw(screen)
 
     pygame.display.update()
     GAME_CLOCK.tick(60)
