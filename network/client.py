@@ -70,7 +70,7 @@ class GameClient(myClient):
     def __msg_is_keyboard_state(msg):
         try: 
             return len(msg) == 26
-        except:
+        except Exception:
             return False
 
 if __name__=="__main__":
