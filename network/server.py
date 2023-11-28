@@ -19,26 +19,23 @@ class myServer:
         self.server.listen(1)
 
         #Functions to run the server
+        self.serverLoop = threading.Thread(target=self.mainLoop)
+        self.serverLoop.start()
+
+    def __del__(self):
+        self.server.close()
+
+    def mainLoop(self):
         try:
             while True:
                 print("Waiting for client")
                 conn, addr = self.server.accept()
-                conn.send(f"Welcome, {addr}!".encode())
-
-                print("connected with",addr)
-
-                t = threading.Thread(target=self.clientHandler, args=(conn,addr))
-                t.start()
-
-                self.clientList.append(conn)
+                self.on_client_connect(conn, addr)
         except KeyboardInterrupt:
             print("Stopped by Ctrl+C")
         finally:
             if self.server:
                 self.server.close()
-
-    def __del__(self):
-        self.server.close()
 
     def clientHandler(self, conn, adr):
         while True:
@@ -52,6 +49,16 @@ class myServer:
 
             print(f"message from {adr}: {c_msg}")
             self.broadcast(c_msg_bin)
+
+    def on_client_connect(self, conn, addr):
+        conn.send(f"Welcome, {addr}!".encode())
+
+        print("connected with",addr)
+
+        t = threading.Thread(target=self.clientHandler, args=(conn,addr))
+        t.start()
+
+        self.clientList.append(conn)
 
     def broadcast(self,message):
         for conn in self.clientList:
