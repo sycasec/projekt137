@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
 import pygame
+import random
 
-from components.keys import KeyHelper
+from components.keys import Key, KeyHelper
 from components.background import Background
 from network.client import myClient
 from components.timer import Timer
@@ -14,6 +15,7 @@ from screens.about import AboutScreen
 from screens.loading import Waiting
 from screens.assignment import ColorAssignment
 from screens.countdown import Countdown
+from screens.gameover import GameOver
 
 WINDOW_WIDTH = 1125
 WINDOW_HEIGHT = 800
@@ -74,6 +76,7 @@ def receive_keypress(key):
     scores.add_score(to_add)
 
 def receive_keyboard_state(s):
+    scores.reset_scores()
     keys.set_key_colors_from_string(s)
 
 
@@ -83,7 +86,7 @@ about_screen = AboutScreen(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 waiting_screen = Waiting(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 assignment_screen = ColorAssignment(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 countdown_screen = Countdown(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
-
+gameover_screen = GameOver(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 active_screen = "home"
 
 
@@ -93,41 +96,45 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-
-        elif active_screen == "play":
-            if event.type == pygame.KEYDOWN:
-                if event.key in k_dict:
-                    try:
-                        # c.send(event.key)
-                        k_dict[event.key].on_key_press()
-                    except Exception as e:
-                        print(f"Something went wrong when sending your keypress: {e}")
-
-        
-        # HOME SCREEN
-        elif active_screen == "home":
-            result = home_screen.handle_event(event)
-            if result is not None:
-                if result == 0:  # initialize a game button
-                    s = myServer()
-                    c = GameClient(
-                        receive_keypress=receive_keypress,
-                        receive_keyboard_state=receive_keyboard_state
-                    )
-                    active_screen = "play"
-                elif result == 1:  # join a game button
-                    c = GameClient(
-                        receive_keypress=receive_keypress,
-                        receive_keyboard_state=receive_keyboard_state
-                    )
-                    c.send(keys.get_key_colors().encode()) # Synchronize everyone's keyboard colors to ours
-                    active_screen = "load"
-                elif result == 2:  # About button
-                    active_screen = "about"
-                elif result == 3:  # Quit button
-                    pygame.quit()
-                    exit()
-
+        elif event.type == pygame.KEYDOWN:
+            # --------------------------------- EXPERIMENTAL --------------------------------
+            if active_screen == "play" and event.key in k_dict:
+                try:
+                    c.send(event.key)
+                except Exception as e:
+                    print("Something went wrong when sending your keypress")
+            # --------------------------------- EXPERIMENTAL --------------------------------
+        result = home_screen.handle_event(event)
+        if result is not None:
+            if result == 0:  # initialize a game button
+                s = myServer()
+                c = GameClient(
+                    receive_keypress=receive_keypress,
+                    receive_keyboard_state=receive_keyboard_state
+                )
+                active_screen = "play"
+            elif result == 1:  # join a game button
+                c = GameClient(
+                    receive_keypress=receive_keypress,
+                    receive_keyboard_state=receive_keyboard_state
+                )
+                c.send(keys.get_key_colors().encode()) # Synchronize everyone's keyboard colors to ours
+                active_screen = "load"
+            elif result == 2:  # About button
+                active_screen = "about"
+            elif result == 3:  # Quit button
+                pygame.quit()
+                exit()
+        elif active_screen == "about":
+            about_result = about_screen.handle_event(event)
+            if about_result == "back":
+                active_screen = "home"
+        elif active_screen == "assignment":
+            assignment_screen.render(screen)
+            result = assignment_screen.handle_event(event)
+            if result == "countdown":
+                active_screen = "countdown"
+                countdown_screen.start_countdown()
 
     if active_screen == "home":
         home_screen.render(screen)
@@ -149,6 +156,20 @@ while True:
             k.draw(screen)
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             active_screen = "home"
+
+        # End the game if all keys are the same color
+        if all(
+            key.target_color == Key.key_green_color 
+            for key in k_dict.values()
+            ):
+            active_screen = "gameover"
+            winner = "GREEN"
+        if all(
+                key.target_color == Key.key_red_color 
+                for key in k_dict.values()
+            ):
+            active_screen = "gameover"
+            winner = "RED"
 
 
     # ABOUT SCREEN
@@ -181,11 +202,22 @@ while True:
     elif active_screen == "countdown":
         countdown_screen.render(screen)
         if countdown_screen.is_complete():
-            active_screen = "play"    
-    
-    
+            active_screen = "play"
+
+    elif active_screen == "gameover":
+        # TODO: IMPORTANT! Find a way to kill the client and server before continuing
+        gameover_screen.render(screen, winner)
+        gameover_result = gameover_screen.handle_event(event)
+        if gameover_result == "rematch":
+            scores.reset_scores()   # Generate new starting colors
+            new_colors = list(("R" * 13) + ("G" * 13))
+            random.shuffle(new_colors)
+            new_colors = "".join(new_colors)
+            keys.set_key_colors_from_string(new_colors)
+            c.send(new_colors.encode())
+
+            active_screen = "play"
+
 
     pygame.display.update()
     GAME_CLOCK.tick(60)
-
-

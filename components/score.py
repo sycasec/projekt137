@@ -45,6 +45,10 @@ class ScoreHelper:
     
     def get_scores(self):
         return self.scores
+    
+    def reset_scores(self):
+        for player in self.scores:
+            self.scores[player].value = 0
 
     def draw(self, screen):
         for score in self.scores.values():
