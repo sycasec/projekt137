@@ -35,11 +35,11 @@ class Key:
     def on_key_press(self):
         self.t_timer = pygame.time.get_ticks()
         # change when server-client logic added
-        if self.color == self.key_default_color:
+        if self.target_color == self.key_default_color:
             self.toggle_green()
-        if self.color.r == self.key_red_color.r or self.color.g == self.key_red_color.g or self.color.b == self.key_red_color.b:
+        if self.target_color == self.key_red_color:
             self.toggle_green() 
-        if self.color.r == self.key_green_color.r or self.color.g == self.key_green_color.g or self.color.b == self.key_green_color.b:
+        if self.target_color == self.key_green_color:
             self.toggle_red()
 
     def update_color(self):
