@@ -46,6 +46,7 @@ class KeyboardSplatoon():
         self.keys = KeyHelper(self.keys_font)
         self.keys.gen_keys()
         self.k_dict = self.keys.get_keys()
+        self.keys.randomize_key_colors()
 
         # Score generation
         self.scores = ScoreHelper(self.score_font)
@@ -109,6 +110,8 @@ class KeyboardSplatoon():
         self.keys.set_key_colors_from_string(s)
 
     def begin_game(self):
+        if self.server is not None:
+            self.client.send(self.keys.get_key_colors().encode())
         self.active_screen = "countdown"
         self.screen_handler.begin_countdown()
 
@@ -194,11 +197,8 @@ class KeyboardSplatoon():
 
                 elif self.active_screen == "rematch":
                     self.scores.reset_scores()   # Generate new starting colors
-                    new_colors = list(("R" * 13) + ("G" * 13))
-                    random.shuffle(new_colors)
-                    new_colors = "".join(new_colors)
-                    self.keys.set_key_colors_from_string(new_colors)
-                    self.client.send(new_colors.encode())
+                    self.keys.randomize_key_colors()
+                    self.client.send(self.keys.get_key_colors().encode())
 
                     self.active_screen = "play"
 
