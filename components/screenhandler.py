@@ -20,10 +20,10 @@ class ScreenHandler():
         self.gameover_screen = GameOver(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 
     #Method to switch to a screen
-    def switch_screen(self, active_screen, event):
+    def switch_screen(self, active_screen, event, winner):
 
         if active_screen == "home":
-            return self.home(event)
+            return self.home()
 
         if active_screen == "host":
             return self.host()
@@ -41,8 +41,10 @@ class ScreenHandler():
         if active_screen == "countdown":
             return self.countdown()
 
-    def home(self, event):
-        self.home_screen.render(self.screen)
+        if active_screen == "gameover":
+            return self.gameover(event,winner)
+
+    def update_home(self, event):
 
         result = self.home_screen.handle_event(event)
 
@@ -58,6 +60,10 @@ class ScreenHandler():
         if result == 3:
             return "quit"
 
+        return self.home()
+
+    def home(self):
+        self.home_screen.render(self.screen)
         return "home"
 
     def about(self, event):
@@ -71,10 +77,10 @@ class ScreenHandler():
         return "about"
 
     def host(self):
-        return "waiting"
+        return "host"
 
     def join(self):
-        return "waiting"
+        return "join"
 
     def waiting(self):
         self.waiting_screen.update()
@@ -92,3 +98,9 @@ class ScreenHandler():
 
         return "countdown"
 
+    def gameover(self, event, winner):
+        self.gameover_screen.render(self.screen,winner)
+        result = self.gameover_screen.handle_event(event)
+        if result == "rematch":
+            return "rematch"
+        return "gameover"

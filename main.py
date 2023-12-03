@@ -53,6 +53,7 @@ class KeyboardSplatoon():
         #Scren handler
         self.screen_handler = ScreenHandler(self.screen,WINDOW_WIDTH,WINDOW_HEIGHT,self.keys_font)
         self.active_screen = "home"
+        self.winner = None
 
         #Network attributes
         self.server = None
@@ -135,17 +136,16 @@ class KeyboardSplatoon():
             for key in self.k_dict.values()
             ):
             self.active_screen = "gameover"
-            winner = "GREEN"
+            self.winner = "GREEN"
         if all(
                 key.target_color == Key.key_red_color
                 for key in self.k_dict.values()
             ):
             self.active_screen = "gameover"
-            winner = "RED"
+            self.winner = "RED"
 
     def run(self):
         while True:
-
             if self.active_screen == "quit":
                 pygame.quit()
                 exit()
@@ -164,12 +164,14 @@ class KeyboardSplatoon():
                         except Exception as e:
                             print("Something went wrong when sending your keypress")
                     # --------------------------------- EXPERIMENTAL --------------------------------
+                if self.active_screen == "home":
+                    self.active_screen = self.screen_handler.update_home(event)
 
             if self.active_screen == "play":
                 self.play(event)
 
             else:
-                self.active_screen = self.screen_handler.switch_screen(self.active_screen,event)
+                self.active_screen = self.screen_handler.switch_screen(self.active_screen,event,self.winner)
 
                 if self.active_screen == "host":
                     self.server = myServer()
@@ -179,6 +181,7 @@ class KeyboardSplatoon():
                         receive_game_state=self.decode_game_state,
                         begin_game=self.begin_game
                     )
+                    self.active_screen = "waiting"
 
                 elif self.active_screen == "join":
                     self.client = GameClient(
@@ -187,7 +190,17 @@ class KeyboardSplatoon():
                         receive_game_state=self.decode_game_state,
                         begin_game=self.begin_game
                     )
+                    self.active_screen = "waiting"
 
+                elif self.active_screen == "rematch":
+                    self.scores.reset_scores()   # Generate new starting colors
+                    new_colors = list(("R" * 13) + ("G" * 13))
+                    random.shuffle(new_colors)
+                    new_colors = "".join(new_colors)
+                    self.keys.set_key_colors_from_string(new_colors)
+                    self.client.send(new_colors.encode())
+
+                    self.active_screen = "play"
 
             pygame.display.update()
             GAME_CLOCK.tick(60)
