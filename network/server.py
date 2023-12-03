@@ -35,7 +35,7 @@ class myServer:
                 if self.connected_players == 2 and self.status == "WAIT":
                     self.status = "START"
                     time.sleep(1)
-                    self.broadcast(pickle.dumps("GAME START"))
+                    self.broadcast("GAME START".encode())
                 elif self.status == "WAIT":
                     print("Waiting for client")
                     conn, addr = self.server.accept()

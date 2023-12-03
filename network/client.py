@@ -58,12 +58,14 @@ class GameClient(myClient):
 
 
     def receive_broadcast(self, msg):
+        if isinstance(msg, bytes):
+            msg = msg.decode()
         print(f"Broadcast received: {msg}")
         if self.__msg_is_keypress(msg):
             self.receive_keypress(msg)
 
         elif self.__msg_is_keyboard_state(msg):
-            self.receive_keyboard_state(msg.decode())
+            self.receive_keyboard_state(msg)
 
         if msg == "GAME START":
             self.begin_game()
