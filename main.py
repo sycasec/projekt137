@@ -153,6 +153,7 @@ class KeyboardSplatoon():
                         receive_keyboard_state=self.receive_keyboard_state,
                         begin_game=self.begin_game
                     )
+                    self.active_screen = "waiting"
 
                 elif self.active_screen == "join":
                     self.client = GameClient(
@@ -160,6 +161,7 @@ class KeyboardSplatoon():
                         receive_keyboard_state=self.receive_keyboard_state,
                         begin_game=self.begin_game
                     )
+                    self.active_screen = "waiting"
 
 
             pygame.display.update()

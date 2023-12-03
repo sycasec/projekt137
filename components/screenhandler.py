@@ -74,10 +74,10 @@ class ScreenHandler():
         return "about"
 
     def host(self):
-        return "waiting"
+        return "host"
 
     def join(self):
-        return "waiting"
+        return "join"
 
     def waiting(self):
         self.waiting_screen.update()
