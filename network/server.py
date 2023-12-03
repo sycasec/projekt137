@@ -1,7 +1,7 @@
 import socket
 import threading
 import pickle
-
+import time
 
 class myServer:
 
@@ -18,19 +18,30 @@ class myServer:
         self.server.bind((self.host,self.port))
         self.server.listen(1)
 
+        self.connected_players = 0
+
         #Functions to run the server
         self.serverLoop = threading.Thread(target=self.mainLoop)
+        self.serverLoop.daemon = True
         self.serverLoop.start()
 
+        self.status = "WAIT"
     def __del__(self):
         self.server.close()
 
     def mainLoop(self):
         try:
             while True:
-                print("Waiting for client")
-                conn, addr = self.server.accept()
-                self.on_client_connect(conn, addr)
+                if self.connected_players == 2 and self.status == "WAIT":
+                    self.status = "START"
+                    time.sleep(1)
+                    self.broadcast(pickle.dumps("GAME START"))
+                else:
+                    print("Waiting for client")
+                    conn, addr = self.server.accept()
+                    self.on_client_connect(conn, addr)
+                time.sleep(1)
+
         except KeyboardInterrupt:
             print("Stopped by Ctrl+C")
         finally:
@@ -54,6 +65,8 @@ class myServer:
         conn.send(f"Welcome, {addr}!".encode())
 
         print("connected with",addr)
+
+        self.connected_players += 1
 
         t = threading.Thread(target=self.clientHandler, args=(conn,addr))
         t.start()

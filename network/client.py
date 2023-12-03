@@ -3,10 +3,10 @@ import socket
 import threading
 import pygame
 
-class myClient:    
-    def __init__(self, 
-                 host="localhost", 
-                 port=7634, 
+class myClient:
+    def __init__(self,
+                 host="localhost",
+                 port=7634,
                  on_receive=lambda msg: print(f"Broadcast message received: {msg}")
                  ):
         self.s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -16,6 +16,7 @@ class myClient:
         self.s.connect((self.host, self.port))
 
         t_receive = threading.Thread(target=self.broadcast_receiver)
+        t_receive.daemon = True
         t_receive.start()
 
     def broadcast_receiver(self):
@@ -38,15 +39,17 @@ class myClient:
         self.s.send(to_send)
 
 class GameClient(myClient):
-    def __init__(self, 
+    def __init__(self,
                  receive_keypress,
                  receive_keyboard_state,
-                 host="localhost", 
-                 port=7634, 
+                 begin_game,
+                 host="localhost",
+                 port=7634,
                  on_receive=None
                  ):
         self.receive_keypress = receive_keypress
         self.receive_keyboard_state = receive_keyboard_state
+        self.begin_game = begin_game
 
         if on_receive is None:
             on_receive = self.receive_broadcast
@@ -62,13 +65,16 @@ class GameClient(myClient):
         elif self.__msg_is_keyboard_state(msg):
             self.receive_keyboard_state(msg.decode())
 
+        if msg == "GAME START":
+            self.begin_game()
+
     @staticmethod
     def __msg_is_keypress(msg):
         return isinstance(msg, int) and  pygame.K_a <= msg <= pygame.K_z
-    
+
     @staticmethod
     def __msg_is_keyboard_state(msg):
-        try: 
+        try:
             return len(msg) == 26
         except Exception:
             return False
