@@ -46,6 +46,11 @@ class ScoreHelper:
     def get_scores(self):
         return self.scores
     
+    def set_score(self, player, value):
+        if player not in [self.GREEN, self.RED]:
+            return False
+        self.scores[player].value = value
+    
     def reset_scores(self):
         for player in self.scores:
             self.scores[player].value = 0

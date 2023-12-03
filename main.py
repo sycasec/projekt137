@@ -58,6 +58,31 @@ class KeyboardSplatoon():
         self.server = None
         self.client = None
 
+    def encode_game_state(self, delimiter="$"):
+        """Takes the current keyboard and player scores and encodes them in a delimited string
+
+        Returns:
+            str: delimited string containing the colors of each key, 
+                the green player's score, and the red player's score
+        """
+        keys = self.keys.get_key_colors()
+        scores = self.scores.get_scores()
+
+        game_state = []
+        game_state.append(keys)
+        game_state.append(str(scores[self.scores.GREEN].value))
+        game_state.append(str(scores[self.scores.RED].value))
+
+        print(delimiter.join(game_state))
+        return delimiter.join(game_state)
+    
+    def decode_game_state(self, game_state, delimiter="$"):
+        keys, green_score, red_score = game_state.split(delimiter)
+        self.keys.set_key_colors_from_string(keys)
+
+        self.scores.set_score(self.scores.GREEN, int(green_score))
+        self.scores.set_score(self.scores.RED, int(red_score))
+
     # Network actions
     def receive_keypress(self,key):
         try:
@@ -150,6 +175,7 @@ class KeyboardSplatoon():
                     self.client = GameClient(
                         receive_keypress=self.receive_keypress,
                         receive_keyboard_state=self.receive_keyboard_state,
+                        receive_game_state=self.decode_game_state,
                         begin_game=self.begin_game
                     )
 
@@ -157,6 +183,7 @@ class KeyboardSplatoon():
                     self.client = GameClient(
                         receive_keypress=self.receive_keypress,
                         receive_keyboard_state=self.receive_keyboard_state,
+                        receive_game_state=self.decode_game_state,
                         begin_game=self.begin_game
                     )
 

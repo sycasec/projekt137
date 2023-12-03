@@ -42,6 +42,7 @@ class GameClient(myClient):
     def __init__(self,
                  receive_keypress,
                  receive_keyboard_state,
+                 receive_game_state,
                  begin_game,
                  host="localhost",
                  port=7634,
@@ -49,6 +50,7 @@ class GameClient(myClient):
                  ):
         self.receive_keypress = receive_keypress
         self.receive_keyboard_state = receive_keyboard_state
+        self.receive_game_state = receive_game_state
         self.begin_game = begin_game
 
         if on_receive is None:
@@ -67,6 +69,8 @@ class GameClient(myClient):
         elif self.__msg_is_keyboard_state(msg):
             self.receive_keyboard_state(msg)
 
+        elif self.__msg_is_game_state(msg):
+            self.receive_game_state(msg)
         if msg == "GAME START":
             self.begin_game()
 
@@ -80,6 +84,16 @@ class GameClient(myClient):
             return len(msg) == 26
         except Exception:
             return False
+        
+    @staticmethod
+    def __msg_is_game_state(msg, delimiter="$"):
+        try:
+            keys, green_score, red_score = msg.split(delimiter)
+            return GameClient.__msg_is_keyboard_state(keys) and  green_score.isdigit() and red_score.isdigit()
+        except ValueError:
+            print("Wrong scores")
+            return False
+
 
 if __name__=="__main__":
     myClient()
