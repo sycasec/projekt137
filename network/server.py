@@ -19,13 +19,13 @@ class myServer:
         self.server.listen(1)
 
         self.connected_players = 0
-
+        self.status = "WAIT"
         #Functions to run the server
         self.serverLoop = threading.Thread(target=self.mainLoop)
         self.serverLoop.daemon = True
         self.serverLoop.start()
 
-        self.status = "WAIT"
+
     def __del__(self):
         self.server.close()
 
