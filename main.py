@@ -159,7 +159,8 @@ class KeyboardSplatoon():
                     # --------------------------------- EXPERIMENTAL --------------------------------
                     if self.active_screen == "play" and event.key in self.k_dict:
                         try:
-                            self.client.send(event.key)
+                            self.receive_keypress(event.key)
+                            self.client.send(self.encode_game_state())
                         except Exception as e:
                             print("Something went wrong when sending your keypress")
                     # --------------------------------- EXPERIMENTAL --------------------------------
