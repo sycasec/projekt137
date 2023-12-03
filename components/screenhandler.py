@@ -23,7 +23,7 @@ class ScreenHandler():
     def switch_screen(self, active_screen, event):
 
         if active_screen == "home":
-            return self.home(event)
+            return self.home()
 
         if active_screen == "host":
             return self.host()
@@ -41,8 +41,7 @@ class ScreenHandler():
         if active_screen == "countdown":
             return self.countdown()
 
-    def home(self, event):
-        self.home_screen.render(self.screen)
+    def update_home(self, event):
 
         result = self.home_screen.handle_event(event)
 
@@ -58,6 +57,10 @@ class ScreenHandler():
         if result == 3:
             return "quit"
 
+        return self.home()
+
+    def home(self):
+        self.home_screen.render(self.screen)
         return "home"
 
     def about(self, event):

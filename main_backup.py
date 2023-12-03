@@ -93,7 +93,7 @@ active_screen = "home"
 # main loop
 while True:
     for event in pygame.event.get():
-        print(event)
+
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
@@ -105,6 +105,7 @@ while True:
                 except Exception as e:
                     print("Something went wrong when sending your keypress")
             # --------------------------------- EXPERIMENTAL --------------------------------
+        print(event)
         result = home_screen.handle_event(event)
         if result is not None:
             if result == 0:  # initialize a game button

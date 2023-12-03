@@ -120,7 +120,6 @@ class KeyboardSplatoon():
 
     def run(self):
         while True:
-
             if self.active_screen == "quit":
                 pygame.quit()
                 exit()
@@ -138,6 +137,8 @@ class KeyboardSplatoon():
                         except Exception as e:
                             print("Something went wrong when sending your keypress")
                     # --------------------------------- EXPERIMENTAL --------------------------------
+                if self.active_screen == "home":
+                    self.active_screen = self.screen_handler.update_home(event)
 
             if self.active_screen == "play":
                 self.play(event)
