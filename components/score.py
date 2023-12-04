@@ -24,6 +24,7 @@ class ScoreHelper:
     green_color = pygame.Color(147,196,125)
     GREEN = "G"
     RED = "R"
+    TIE = "D"
 
     def __init__(self, score_font):
         self.font = score_font
@@ -64,7 +65,7 @@ class ScoreHelper:
         elif self.scores[self.RED] > self.scores[self.GREEN]:
             return self.RED
         else:
-            return "TIE"
+            return self.TIE
 
     def draw(self, screen):
         for score in self.scores.values():
