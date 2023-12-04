@@ -199,7 +199,8 @@ class KeyboardSplatoon():
                     self.active_screen = "waiting"
 
                 elif self.active_screen == "rematch":
-                    self.scores.reset_scores()   # Generate new starting colors
+                    self.scores.reset_scores()
+                    self.timer_bar.reset()
                     self.keys.randomize_key_colors()
                     self.client.send(self.keys.get_key_colors().encode())
 
