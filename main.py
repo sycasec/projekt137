@@ -75,7 +75,6 @@ class KeyboardSplatoon():
         game_state.append(str(scores[self.scores.GREEN].value))
         game_state.append(str(scores[self.scores.RED].value))
 
-        print(delimiter.join(game_state))
         return delimiter.join(game_state)
     
     def decode_game_state(self, game_state, delimiter="$"):

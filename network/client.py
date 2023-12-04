@@ -91,7 +91,6 @@ class GameClient(myClient):
             keys, green_score, red_score = msg.split(delimiter)
             return GameClient.__msg_is_keyboard_state(keys) and  green_score.isdigit() and red_score.isdigit()
         except ValueError:
-            print("Wrong scores")
             return False
 
 
