@@ -3,6 +3,9 @@ import threading
 import pickle
 import time
 
+#time in s how long each round is
+GAME_LENGTH = 10
+
 class myServer:
 
     def __init__(self, host="0.0.0.0", port=7634):
@@ -36,6 +39,8 @@ class myServer:
                     self.status = "START"
                     time.sleep(1)
                     self.broadcast("GAME START".encode())
+                    time.sleep(GAME_LENGTH + 3)
+                    self.broadcast("GAME OVER".encode())
                 elif self.status == "WAIT":
                     print("Waiting for client")
                     conn, addr = self.server.accept()

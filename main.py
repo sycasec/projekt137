@@ -64,7 +64,7 @@ class KeyboardSplatoon():
         """Takes the current keyboard and player scores and encodes them in a delimited string
 
         Returns:
-            str: delimited string containing the colors of each key, 
+            str: delimited string containing the colors of each key,
                 the green player's score, and the red player's score
         """
         keys = self.keys.get_key_colors()
@@ -76,7 +76,7 @@ class KeyboardSplatoon():
         game_state.append(str(scores[self.scores.RED].value))
 
         return delimiter.join(game_state)
-    
+
     def decode_game_state(self, game_state, delimiter="$"):
         keys, green_score, red_score = game_state.split(delimiter)
         self.keys.set_key_colors_from_string(keys)
@@ -108,11 +108,16 @@ class KeyboardSplatoon():
         self.scores.reset_scores()
         self.keys.set_key_colors_from_string(s)
 
-    def begin_game(self):
-        if self.server is not None:
-            self.client.send(self.keys.get_key_colors().encode())
-        self.active_screen = "countdown"
-        self.screen_handler.begin_countdown()
+    def server_action(self, msg):
+        if msg == "GAME START":
+            if self.server is not None:
+                self.client.send(self.keys.get_key_colors().encode())
+            self.active_screen = "countdown"
+            self.screen_handler.begin_countdown()
+
+        if msg == "GAME OVER":
+            self.winner = "RED"
+            self.active_screen = "gameover"
 
     #Main Play
     def play(self, event):
@@ -181,7 +186,7 @@ class KeyboardSplatoon():
                         receive_keypress=self.receive_keypress,
                         receive_keyboard_state=self.receive_keyboard_state,
                         receive_game_state=self.decode_game_state,
-                        begin_game=self.begin_game
+                        server_action=self.server_action
                     )
                     self.active_screen = "waiting"
 
@@ -190,7 +195,7 @@ class KeyboardSplatoon():
                         receive_keypress=self.receive_keypress,
                         receive_keyboard_state=self.receive_keyboard_state,
                         receive_game_state=self.decode_game_state,
-                        begin_game=self.begin_game
+                        server_action=self.server_action
                     )
                     self.active_screen = "waiting"
 

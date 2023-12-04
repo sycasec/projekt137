@@ -43,7 +43,7 @@ class GameClient(myClient):
                  receive_keypress,
                  receive_keyboard_state,
                  receive_game_state,
-                 begin_game,
+                 server_action,
                  host="localhost",
                  port=7634,
                  on_receive=None
@@ -51,7 +51,7 @@ class GameClient(myClient):
         self.receive_keypress = receive_keypress
         self.receive_keyboard_state = receive_keyboard_state
         self.receive_game_state = receive_game_state
-        self.begin_game = begin_game
+        self.server_action = server_action
 
         if on_receive is None:
             on_receive = self.receive_broadcast
@@ -71,8 +71,8 @@ class GameClient(myClient):
 
         elif self.__msg_is_game_state(msg):
             self.receive_game_state(msg)
-        if msg == "GAME START":
-            self.begin_game()
+        else:
+            self.server_action(msg)
 
     @staticmethod
     def __msg_is_keypress(msg):
@@ -84,7 +84,7 @@ class GameClient(myClient):
             return len(msg) == 26
         except Exception:
             return False
-        
+
     @staticmethod
     def __msg_is_game_state(msg, delimiter="$"):
         try:
