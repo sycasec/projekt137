@@ -64,7 +64,7 @@ class KeyboardSplatoon():
         """Takes the current keyboard and player scores and encodes them in a delimited string
 
         Returns:
-            str: delimited string containing the colors of each key, 
+            str: delimited string containing the colors of each key,
                 the green player's score, and the red player's score
         """
         keys = self.keys.get_key_colors()
@@ -76,7 +76,7 @@ class KeyboardSplatoon():
         game_state.append(str(scores[self.scores.RED].value))
 
         return delimiter.join(game_state)
-    
+
     def decode_game_state(self, game_state, delimiter="$"):
         keys, green_score, red_score = game_state.split(delimiter)
         self.keys.set_key_colors_from_string(keys)
@@ -126,6 +126,12 @@ class KeyboardSplatoon():
         self.timer_bar.update(dt)
         self.timer_bar.draw(self.screen)
         self.scores.draw(self.screen)
+
+        if self.timer_bar.is_done():
+            winner = self.scores.publish_winner()
+
+            self.keys.set_key_colors_from_string(winner * 26)
+            self.client.send(self.encode_game_state())
 
         for k in self.k_dict.values():
             k.draw(self.screen)

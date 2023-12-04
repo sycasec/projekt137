@@ -7,7 +7,7 @@ class Score:
         self.x, self.y = coords
         self.color = color
         self.font = t_font
-    
+
     def add_score(self, new_value):
         self.value += new_value
 
@@ -16,8 +16,11 @@ class Score:
         t_rect = t_surf.get_rect(center=(self.x + self.score_rect_size // 2, self.y + self.score_rect_size // 2))
         screen.blit(t_surf, t_rect)
 
+    def __gt__(self,other):
+        return self.value > other.value
+
 class ScoreHelper:
-    red_color = pygame.Color(224,102,102) 
+    red_color = pygame.Color(224,102,102)
     green_color = pygame.Color(147,196,125)
     GREEN = "G"
     RED = "R"
@@ -28,7 +31,7 @@ class ScoreHelper:
         self.y_val = 300
         self.x_inc = 100
         self.scores = self.gen_scores()
-    
+
     def add_score(self, player, amount=10):
         self.scores[player].add_score(amount)
 
@@ -42,20 +45,27 @@ class ScoreHelper:
         scores[self.RED] = Score(self.red_color, (x, y), self.font)
 
         return scores
-    
+
     def get_scores(self):
         return self.scores
-    
+
     def set_score(self, player, value):
         if player not in [self.GREEN, self.RED]:
             return False
         self.scores[player].value = value
-    
+
     def reset_scores(self):
         for player in self.scores:
             self.scores[player].value = 0
 
+    def publish_winner(self):
+        if self.scores[self.GREEN] > self.scores[self.RED]:
+            return self.GREEN
+        elif self.scores[self.RED] > self.scores[self.GREEN]:
+            return self.RED
+        else:
+            return "TIE"
+
     def draw(self, screen):
         for score in self.scores.values():
             score.draw(screen)
-    
