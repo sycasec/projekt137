@@ -143,12 +143,18 @@ class KeyboardSplatoon():
             ):
             self.active_screen = "gameover"
             self.winner = "GREEN"
-        if all(
+        elif all(
                 key.target_color == Key.key_red_color
                 for key in self.k_dict.values()
             ):
             self.active_screen = "gameover"
             self.winner = "RED"
+        elif all(
+                key.target_color == Key.key_default_color
+                for key in self.k_dict.values()
+            ):
+            self.active_screen = "gameover"
+            self.winner = "TIE"
 
     def run(self):
         while True:
