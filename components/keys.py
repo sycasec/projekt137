@@ -37,9 +37,9 @@ class Key:
         # change when server-client logic added
         if self.target_color == self.key_default_color:
             self.toggle_green()
-        if self.target_color == self.key_red_color:
+        elif self.target_color == self.key_red_color:
             self.toggle_green() 
-        if self.target_color == self.key_green_color:
+        elif self.target_color == self.key_green_color:
             self.toggle_red()
 
     def update_color(self):
