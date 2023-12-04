@@ -14,7 +14,7 @@ class Key:
         self.key = assigned_key
         self.x = coords[0]
         self.y = coords[1] 
-        start_color = self.random_color()
+        start_color = self.key_default_color
         self.color = start_color
         self.target_color = start_color
         self.t_timer = 0
@@ -114,6 +114,14 @@ class KeyHelper:
     def get_keys(self):
         return self.keys_dict
     
+    def randomize_key_colors(self):
+        new_colors = list(("R" * 13) + ("G" * 13))
+        random.shuffle(new_colors)
+        new_colors = "".join(new_colors)
+        self.set_key_colors_from_string(new_colors)
+
+        return new_colors
+
     def get_key_colors(self):
         """Generates a string representing the colors of all 26 keys on the keyboard
 
