@@ -45,16 +45,15 @@ class Key:
     def update_color(self):
         elapsed_time = pygame.time.get_ticks() - self.t_timer
 
-        if elapsed_time < self.t_duration:
-            interpolation_factor = elapsed_time / self.t_duration 
-            self.color = pygame.Color(
-                int(pygame.math.lerp(
-                    self.color.r, self.target_color.r, interpolation_factor)),
-                int(pygame.math.lerp(
-                    self.color.g, self.target_color.g, interpolation_factor)),
-                int(pygame.math.lerp(
-                    self.color.b, self.target_color.b, interpolation_factor))
-            )
+        interpolation_factor = min(elapsed_time / self.t_duration, 1) 
+        self.color = pygame.Color(
+            int(pygame.math.lerp(
+                self.color.r, self.target_color.r, interpolation_factor)),
+            int(pygame.math.lerp(
+                self.color.g, self.target_color.g, interpolation_factor)),
+            int(pygame.math.lerp(
+                self.color.b, self.target_color.b, interpolation_factor))
+        )
 
     def draw(self, screen):
 
