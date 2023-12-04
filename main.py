@@ -129,8 +129,6 @@ class KeyboardSplatoon():
 
         for k in self.k_dict.values():
             k.draw(self.screen)
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            self.active_screen = "home"
 
         # End the game if all keys are the same color
         if all(
