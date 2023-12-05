@@ -17,10 +17,10 @@ class Countdown:
 
     def choose_color(self, color):
         if color == "RED":
-            self.color = ("R", (224, 102, 102))
+            self.color = ("RED", (224, 102, 102))
 
         if color == "GREEN":
-            self.color = ("G", (102, 224, 102))
+            self.color = ("GREEN", (102, 224, 102))
 
     def text(self):
         self.title_font = pygame.font.Font(pygame.font.get_default_font(), self.title_font_size)
