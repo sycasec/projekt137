@@ -189,7 +189,6 @@ class KeyboardSplatoon():
                 self.play(event)
 
             else:
-                time.sleep(0.05)
                 self.active_screen = self.screen_handler.switch_screen(self.active_screen,event,self.winner, self.client_type, self.host_address)
 
                 if self.active_screen == "host":
