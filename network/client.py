@@ -10,17 +10,15 @@ class myClient:
                  on_receive=lambda msg: print(f"Broadcast message received: {msg}")
                  ):
         self.s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        self.host = host
         self.port = port
         self.on_receive = on_receive
-        self.connect_server(host)
-        
-    def connect_server(self, host):
-        self.host = host
         self.s.connect((self.host, self.port))
+
         t_receive = threading.Thread(target=self.broadcast_receiver)
         t_receive.daemon = True
         t_receive.start()
-
+                
     def broadcast_receiver(self):
         while True:
             s_msg_bin = self.s.recv(1024)
@@ -31,7 +29,6 @@ class myClient:
                 s_msg = pickle.loads(s_msg_bin)
 
             self.on_receive(s_msg)
-
 
     def send(self, data):
         try:
@@ -59,7 +56,6 @@ class GameClient(myClient):
             on_receive = self.receive_broadcast
 
         super().__init__(host, port, on_receive)
-        # self.connect_server(host)
 
 
     def receive_broadcast(self, msg):

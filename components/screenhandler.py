@@ -65,7 +65,7 @@ class ScreenHandler():
         self.waiting_screen.handle_event(event)
         
     def get_host(self):
-        self.waiting_screen.get_final_ip()
+        return self.waiting_screen.get_final_ip()
 
     def home(self):
         self.home_screen.render(self.screen)

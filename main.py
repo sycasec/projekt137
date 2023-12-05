@@ -58,6 +58,7 @@ class KeyboardSplatoon():
         
         self.client_type = None
         self.host_address = None
+        self.is_client_initialized = False
         
         #Network attributes
         self.server = None
@@ -149,10 +150,9 @@ class KeyboardSplatoon():
             self.active_screen = "gameover"
             self.winner = "RED"
 
-    def run(self):
-        waiting_client_event = None
-        
+    def run(self):        
         while True:
+            print(self.active_screen)
             if self.active_screen == "quit":
                 pygame.quit()
                 exit()
@@ -173,13 +173,16 @@ class KeyboardSplatoon():
                     # --------------------------------- EXPERIMENTAL --------------------------------
                 if self.active_screen == "home":
                     self.active_screen = self.screen_handler.update_home(event)
-                    
+                
+                # Handle entering of IP address for waiting client
                 if self.active_screen == "waiting" and self.client_type == "client":
                     if event.type == pygame.KEYDOWN:
+                        self.screen_handler.update_waiting(event)
+                        
                         if event.key == pygame.K_RETURN:
                             self.host_address = self.screen_handler.get_host()
-                        else:
-                            self.screen_handler.update_waiting(event)
+                            print("connecting to host", self.screen_handler.get_host())
+
                                                                 
             if self.active_screen == "play":
                 self.play(event)
@@ -188,6 +191,7 @@ class KeyboardSplatoon():
                 self.active_screen = self.screen_handler.switch_screen(self.active_screen,event,self.winner, self.client_type, self.host_address)
 
                 if self.active_screen == "host":
+                    
                     self.server = myServer()
                     self.client = GameClient(
                         receive_keypress=self.receive_keypress,
@@ -200,14 +204,17 @@ class KeyboardSplatoon():
                     self.client_type = "host"
                     self.active_screen = "waiting"
 
-                elif self.active_screen == "join":
-                    if self.host_address != None:
+                elif self.active_screen == "join" or (self.client_type == "client" and self.active_screen == "waiting"):
+                    # Ensure GameClient is run only once
+                    if self.host_address != None and not self.is_client_initialized:
                         self.client = GameClient(
+                            host=self.host_address,
                             receive_keypress=self.receive_keypress,
                             receive_keyboard_state=self.receive_keyboard_state,
                             receive_game_state=self.decode_game_state,
                             begin_game=self.begin_game
                         )
+                        self.is_client_initialized = True
                     
                     self.client_type = "client"
                     self.active_screen = "waiting"

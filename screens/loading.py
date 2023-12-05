@@ -66,6 +66,7 @@ class Waiting:
 
     def handle_event(self, event):
         self.ip_input_box.handle_event(event)
+        
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
