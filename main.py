@@ -60,6 +60,8 @@ class KeyboardSplatoon():
         self.server = None
         self.client = None
 
+        self.color = None
+
     def encode_game_state(self, delimiter="$"):
         """Takes the current keyboard and player scores and encodes them in a delimited string
 
@@ -112,6 +114,9 @@ class KeyboardSplatoon():
     def begin_game(self):
         if self.server is not None:
             self.client.send(self.keys.get_key_colors().encode())
+            self.color = "GREEN"
+        else:
+            self.color = "RED"
         self.active_screen = "countdown"
         self.screen_handler.begin_countdown()
 
@@ -184,7 +189,15 @@ class KeyboardSplatoon():
                 self.play(event)
 
             else:
-                self.active_screen = self.screen_handler.switch_screen(self.active_screen,event,self.winner)
+                kwargs = {}
+                if self.active_screen in ("about", "gameover"):
+                    kwargs.update({'event':event})
+                if self.active_screen == "gameover":
+                    kwargs.update({"winner":self.winner})
+                if self.active_screen == "countdown":
+                    kwargs.update({"color":self.color})
+
+                self.active_screen = self.screen_handler.switch_screen(self.active_screen, **kwargs)
 
                 if self.active_screen == "host":
                     self.server = myServer()

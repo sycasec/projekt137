@@ -58,3 +58,10 @@ class ColorAssignment:
         screen.fill((255, 255, 255))
         screen.blit(self.title_surface, self.title_surface.get_rect(center=(self.screen_width // 2, self.screen_height // 2)))
         pygame.display.flip()
+
+if __name__ == "__main__":
+    pygame.init()
+    screen = pygame.display.set_mode((1125, 800))
+    assignment = ColorAssignment(1125,800,pygame.font.Font(pygame.font.get_default_font(),36))
+    while True:
+        assignment.render(screen)

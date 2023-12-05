@@ -9,12 +9,35 @@ class Countdown:
         self.text_font_size = 24
         self.countdown_font_size = 100
         self.countdown_duration = 3  # seconds
+        self.title_font_size = 50
+        self.color = None
 
-        self.text()
 
         self.start_time = None
 
+    def choose_color(self, color):
+        if color == "RED":
+            self.color = ("R", (224, 102, 102))
+
+        if color == "GREEN":
+            self.color = ("G", (102, 224, 102))
+
     def text(self):
+        self.title_font = pygame.font.Font(pygame.font.get_default_font(), self.title_font_size)
+        color, color_rgb = self.color
+
+        you_are_text = "You are "
+        you_are_surface = self.title_font.render(you_are_text, True, (0, 0, 0))
+
+        assigned_color_text = f"{color}"
+        color_surface = self.title_font.render(assigned_color_text, True, color_rgb)
+
+        self.title_surface = pygame.Surface((you_are_surface.get_width() + color_surface.get_width(), max(you_are_surface.get_height(), color_surface.get_height())), pygame.SRCALPHA)
+        self.title_surface.set_colorkey(None)
+        self.title_surface.blit(you_are_surface, (0, 0))
+        self.title_surface.blit(color_surface, (you_are_surface.get_width(), 0))
+
+
         self.text_font = pygame.font.Font(pygame.font.get_default_font(), self.text_font_size)
         text = "Game starting in"
         self.text_surface = self.text_font.render(text, True, "Black")
@@ -24,11 +47,16 @@ class Countdown:
     def start_countdown(self):
         self.start_time = time.time()
 
-    def render(self, screen):
+    def render(self, screen, color):
+        self.choose_color(color)
+        self.text()
+
         screen.fill((255, 255, 255))
         # Display "Game starting in"
         text_rect = self.text_surface.get_rect(center=(self.screen_width // 2, self.screen_height // 2 - self.countdown_font_size // 2))
+        title_rect = self.text_surface.get_rect(center=((self.screen_width - 40) // 2, (self.screen_height - 250) // 2))
         screen.blit(self.text_surface, text_rect)
+        screen.blit(self.title_surface,title_rect)
 
         if self.start_time is not None:
             elapsed_time = time.time() - self.start_time
@@ -45,9 +73,18 @@ class Countdown:
                 screen.blit(digit_surface, (x_position, y_position))
                 x_position += digit_surface.get_width()
 
-            
+
     def is_complete(self):
         if self.start_time is not None:
             elapsed_time = time.time() - self.start_time
             return elapsed_time >= self.countdown_duration
         return False
+
+if __name__ == "__main__":
+    pygame.init()
+    screen = pygame.display.set_mode((1125, 800))
+    countdown = Countdown(1125,800,pygame.font.Font(pygame.font.get_default_font(),36))
+    countdown.start_countdown()
+    while True:
+        countdown.render(screen, "RED")
+        pygame.display.update()

@@ -20,7 +20,7 @@ class ScreenHandler():
         self.gameover_screen = GameOver(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 
     #Method to switch to a screen
-    def switch_screen(self, active_screen, event, winner):
+    def switch_screen(self, active_screen, **kwargs):
 
         if active_screen == "home":
             return self.home()
@@ -32,17 +32,17 @@ class ScreenHandler():
             return self.join()
 
         if active_screen == "about":
-            return self.about(event)
+            return self.about(kwargs["event"])
 
         if active_screen == "waiting":
             return self.waiting()
 
 
         if active_screen == "countdown":
-            return self.countdown()
+            return self.countdown(kwargs["color"])
 
         if active_screen == "gameover":
-            return self.gameover(event,winner)
+            return self.gameover(kwargs["event"],kwargs["winner"])
 
     def update_home(self, event):
 
@@ -91,8 +91,8 @@ class ScreenHandler():
     def begin_countdown(self):
         self.countdown_screen.start_countdown()
 
-    def countdown(self):
-        self.countdown_screen.render(self.screen)
+    def countdown(self,color):
+        self.countdown_screen.render(self.screen,color)
         if self.countdown_screen.is_complete():
             return "play"
 
