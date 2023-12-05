@@ -106,6 +106,7 @@ class KeyboardSplatoon():
 
     def receive_keyboard_state(self, s):
         self.scores.reset_scores()
+        self.timer_bar.reset()
         self.keys.set_key_colors_from_string(s)
 
     def begin_game(self):
