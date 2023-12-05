@@ -31,22 +31,27 @@ class AboutScreen:
     def text_content(self):
         self.title_text = "ABOUT KEYBOARD SPLATOON"
         self.about_text = """
-            Lorem ipsum dolor sit amet consectetur. Nulla at aenean neque ipsum
-            fringilla egestas. Nulla vitae varius hendrerit vitae dictum volutpat
-            vivamus nunc. Mus etiam etiam ornare eget pretium tincidunt massa.
-            Rutrum donec iaculis ultrices suspendisse feugiat. Lectus scelerisque
-            dolor morbi tempor quis praesent netus elit id. Sit morbi habitant
-            bibendum etiam. Ac consequat amet aliquam tempus viverra fermentum in.
+            Keyboard Splatoon is a multiplayer keyboard-based game where players try 
+            to “paint” the game’s keyboard in their color before the opponent can do 
+            the same 
 
-            Est tortor et etiam consequat facilisis elementum lacinia feugiat.
-            Eu tempor porttitor diam sed dignissim. Ultrices aliquam cras tincidunt
-            sagittis libero eu pharetra nullam. Pretium fusce est et viverra nunc
-            feugiat quis turpis. Eget platea quis vitae fringilla egestas amet.
-            Nibh integer enim quam placerat commodo dictum adipiscing. Leo convallis
-            malesuada aliquet congue aliquet sit. Volutpat nisi a mi facilisis dui
-            vehicula risus arcu consequat. Arcu enim massa aenean id gravida. Donec
-            tristique morbi commodo sagittis pretium ultricies tempor sed. Quis
-            pretium vitae tempor orci congue erat.
+            Mechanics:
+            Each player sees a keyboard where each key is either red or green. 
+            When a player presses a key, that key will toggle its color. 
+
+            Win Conditions/Scoring System:
+            Whenever a key turns into a player’s color, that player gets 10 points 
+            (i.e. if the green player turns a red key into green, they get 10 points). 
+            Pressing multiple keys successively with no mistakes adds a combo 
+            multiplier up to 5x points. Player 1’s goal is to make all keys green, 
+            and player 2’s goal is to make all keys red. If one player succeeds, they 
+            automatically win. If no player succeeds after 10 seconds, the player with 
+            the highest score wins. 
+
+	        If one player manages to cover the entire keyboard in their respective color, 
+            they immediately win. If no player succeeds in this after 10 seconds, the 
+            player with the highest score wins instead.
+
         """
         self.developers_title_y_offset = 30
         self.developers_text = "  del Castillo, Kyle Adrian\n  Dy, Alwyn\n  Gudito, Justine\n  Modequillo, Jethro\n  Pilpa, Myka Jean\n  Tupa, Sam Bondj\n  Ypanto, Goody Carlo"
