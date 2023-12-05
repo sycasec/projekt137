@@ -55,7 +55,10 @@ class KeyboardSplatoon():
         self.screen_handler = ScreenHandler(self.screen,WINDOW_WIDTH,WINDOW_HEIGHT,self.keys_font)
         self.active_screen = "home"
         self.winner = None
-
+        
+        self.client_type = None
+        self.host_address = None
+        
         #Network attributes
         self.server = None
         self.client = None
@@ -147,6 +150,8 @@ class KeyboardSplatoon():
             self.winner = "RED"
 
     def run(self):
+        waiting_client_event = None
+        
         while True:
             if self.active_screen == "quit":
                 pygame.quit()
@@ -168,12 +173,19 @@ class KeyboardSplatoon():
                     # --------------------------------- EXPERIMENTAL --------------------------------
                 if self.active_screen == "home":
                     self.active_screen = self.screen_handler.update_home(event)
-
+                    
+                if self.active_screen == "waiting" and self.client_type == "client":
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_RETURN:
+                            self.host_address = self.screen_handler.get_host()
+                        else:
+                            self.screen_handler.update_waiting(event)
+                                                                
             if self.active_screen == "play":
                 self.play(event)
 
-            else:
-                self.active_screen = self.screen_handler.switch_screen(self.active_screen,event,self.winner)
+            else:                   
+                self.active_screen = self.screen_handler.switch_screen(self.active_screen,event,self.winner, self.client_type, self.host_address)
 
                 if self.active_screen == "host":
                     self.server = myServer()
@@ -183,15 +195,21 @@ class KeyboardSplatoon():
                         receive_game_state=self.decode_game_state,
                         begin_game=self.begin_game
                     )
+                    
+                    self.host_address = self.server.hostAddress
+                    self.client_type = "host"
                     self.active_screen = "waiting"
 
                 elif self.active_screen == "join":
-                    self.client = GameClient(
-                        receive_keypress=self.receive_keypress,
-                        receive_keyboard_state=self.receive_keyboard_state,
-                        receive_game_state=self.decode_game_state,
-                        begin_game=self.begin_game
-                    )
+                    if self.host_address != None:
+                        self.client = GameClient(
+                            receive_keypress=self.receive_keypress,
+                            receive_keyboard_state=self.receive_keyboard_state,
+                            receive_game_state=self.decode_game_state,
+                            begin_game=self.begin_game
+                        )
+                    
+                    self.client_type = "client"
                     self.active_screen = "waiting"
 
                 elif self.active_screen == "rematch":

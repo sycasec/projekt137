@@ -20,7 +20,7 @@ class ScreenHandler():
         self.gameover_screen = GameOver(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
 
     #Method to switch to a screen
-    def switch_screen(self, active_screen, event, winner):
+    def switch_screen(self, active_screen, event, winner, client_type, ip_address):
 
         if active_screen == "home":
             return self.home()
@@ -35,8 +35,7 @@ class ScreenHandler():
             return self.about(event)
 
         if active_screen == "waiting":
-            return self.waiting()
-
+            return self.waiting(client_type, ip_address, event)
 
         if active_screen == "countdown":
             return self.countdown()
@@ -61,6 +60,12 @@ class ScreenHandler():
             return "quit"
 
         return self.home()
+    
+    def update_waiting(self, event):
+        self.waiting_screen.handle_event(event)
+        
+    def get_host(self):
+        self.waiting_screen.get_final_ip()
 
     def home(self):
         self.home_screen.render(self.screen)
@@ -82,10 +87,12 @@ class ScreenHandler():
     def join(self):
         return "join"
 
-    def waiting(self):
+    def waiting(self, client_type, ip_address, event):
+        self.waiting_screen.ip_address_display(client_type, ip_address)
+        
         self.waiting_screen.update()
-        self.waiting_screen.render(self.screen)
-
+        self.waiting_screen.render(self.screen, client_type, ip_address, event)
+            
         return "waiting"
 
     def begin_countdown(self):

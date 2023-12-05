@@ -9,7 +9,7 @@ class myServer:
         self.server=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         # Prevent OSError: [Errno 98] Address already in use
         self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
+        
         self.clientList = []
         self.host=host
         self.port=port
@@ -24,6 +24,10 @@ class myServer:
         self.serverLoop = threading.Thread(target=self.mainLoop)
         self.serverLoop.daemon = True
         self.serverLoop.start()
+        
+        # Get host IP address
+        hostname = socket.gethostname()
+        self.hostAddress = socket.gethostbyname(hostname)
 
 
     def __del__(self):
