@@ -1,7 +1,7 @@
 import socket
 import threading
 import pickle
-
+import time
 
 class myServer:
 
@@ -18,27 +18,35 @@ class myServer:
         self.server.bind((self.host,self.port))
         self.server.listen(1)
 
+        self.connected_players = 0
+        self.status = "WAIT"
         #Functions to run the server
+        self.serverLoop = threading.Thread(target=self.mainLoop)
+        self.serverLoop.daemon = True
+        self.serverLoop.start()
+
+
+    def __del__(self):
+        self.server.close()
+
+    def mainLoop(self):
         try:
             while True:
-                print("Waiting for client")
-                conn, addr = self.server.accept()
-                conn.send(f"Welcome, {addr}!".encode())
+                if self.connected_players == 2 and self.status == "WAIT":
+                    self.status = "START"
+                    time.sleep(1)
+                    self.broadcast("GAME START".encode())
+                elif self.status == "WAIT":
+                    print("Waiting for client")
+                    conn, addr = self.server.accept()
+                    self.on_client_connect(conn, addr)
+                time.sleep(1)
 
-                print("connected with",addr)
-
-                t = threading.Thread(target=self.clientHandler, args=(conn,addr))
-                t.start()
-
-                self.clientList.append(conn)
         except KeyboardInterrupt:
             print("Stopped by Ctrl+C")
         finally:
             if self.server:
                 self.server.close()
-
-    def __del__(self):
-        self.server.close()
 
     def clientHandler(self, conn, adr):
         while True:
@@ -52,6 +60,18 @@ class myServer:
 
             print(f"message from {adr}: {c_msg}")
             self.broadcast(c_msg_bin)
+
+    def on_client_connect(self, conn, addr):
+        conn.send(f"Welcome, {addr}!".encode())
+
+        print("connected with",addr)
+
+        self.connected_players += 1
+
+        t = threading.Thread(target=self.clientHandler, args=(conn,addr))
+        t.start()
+
+        self.clientList.append(conn)
 
     def broadcast(self,message):
         for conn in self.clientList:

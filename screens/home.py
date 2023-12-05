@@ -28,10 +28,7 @@ class HomeScreen:
         self.button_rects = [surface.get_rect(topleft=(title_rect.left + 50, title_rect.bottom + i * self.button_spacing + 16)) for i, surface in enumerate(self.button_surfaces)]
 
     def handle_event(self, event):
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 for i, rect in enumerate(self.button_rects):
                     if rect.collidepoint(event.pos):
