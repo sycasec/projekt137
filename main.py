@@ -2,6 +2,7 @@
 
 import pygame
 import random
+import time
 
 from components.keys import Key, KeyHelper
 from components.background import Background
@@ -115,6 +116,7 @@ class KeyboardSplatoon():
     def begin_game(self):
         if self.server is not None:
             self.client.send(self.keys.get_key_colors().encode())
+            
         self.active_screen = "countdown"
         self.screen_handler.begin_countdown()
 
@@ -152,7 +154,6 @@ class KeyboardSplatoon():
 
     def run(self):        
         while True:
-            print(self.active_screen)
             if self.active_screen == "quit":
                 pygame.quit()
                 exit()
@@ -187,7 +188,7 @@ class KeyboardSplatoon():
             if self.active_screen == "play":
                 self.play(event)
 
-            else:                   
+            else:
                 self.active_screen = self.screen_handler.switch_screen(self.active_screen,event,self.winner, self.client_type, self.host_address)
 
                 if self.active_screen == "host":
@@ -200,9 +201,9 @@ class KeyboardSplatoon():
                         begin_game=self.begin_game
                     )
                     
-                    self.host_address = self.server.hostAddress
                     self.client_type = "host"
                     self.active_screen = "waiting"
+                    self.host_address = self.server.hostAddress
 
                 elif self.active_screen == "join" or (self.client_type == "client" and self.active_screen == "waiting"):
                     # Ensure GameClient is run only once
