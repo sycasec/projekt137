@@ -182,17 +182,17 @@ class KeyboardSplatoon():
                         
                         if event.key == pygame.K_RETURN:
                             self.host_address = self.screen_handler.get_host()
-                            print("connecting to host", self.screen_handler.get_host())
+                            print("Connecting to host", self.screen_handler.get_host())
 
                                                                 
             if self.active_screen == "play":
                 self.play(event)
 
             else:
+                time.sleep(0.05)
                 self.active_screen = self.screen_handler.switch_screen(self.active_screen,event,self.winner, self.client_type, self.host_address)
 
                 if self.active_screen == "host":
-                    
                     self.server = myServer()
                     self.client = GameClient(
                         receive_keypress=self.receive_keypress,
@@ -205,7 +205,12 @@ class KeyboardSplatoon():
                     self.active_screen = "waiting"
                     self.host_address = self.server.hostAddress
 
-                elif self.active_screen == "join" or (self.client_type == "client" and self.active_screen == "waiting"):
+                elif self.active_screen == "join":                    
+                    self.client_type = "client"
+                    self.active_screen = "waiting"
+                
+                # Handle waiting client. Wait for user input on host address
+                elif self.client_type == "client" and self.active_screen == "waiting":
                     # Ensure GameClient is run only once
                     if self.host_address != None and not self.is_client_initialized:
                         self.client = GameClient(
@@ -216,9 +221,6 @@ class KeyboardSplatoon():
                             begin_game=self.begin_game
                         )
                         self.is_client_initialized = True
-                    
-                    self.client_type = "client"
-                    self.active_screen = "waiting"
 
                 elif self.active_screen == "rematch":
                     self.scores.reset_scores()   # Generate new starting colors
