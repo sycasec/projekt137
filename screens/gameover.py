@@ -10,11 +10,14 @@ class GameOver:
 
     def text(self, winner):
         self.title_font = pygame.font.Font(pygame.font.get_default_font(), self.title_font_size)
-        color_rgb = (224, 102, 102) if winner == "RED" else (102, 224, 102)
+        if winner == "TIE":
+            color_rgb = (199 ,199 ,199)
+            wins_text = "!"
+        else:
+            color_rgb = (224, 102, 102) if winner == "RED" else (102, 224, 102)
+            wins_text = " WINS!"
 
         color_surface = self.title_font.render(winner, True, color_rgb)
-
-        wins_text = " WINS!"
         wins_surface = self.title_font.render(wins_text, True, (0, 0, 0))
 
         self.title_surface = pygame.Surface((color_surface.get_width() + wins_surface.get_width(), max(color_surface.get_height(), wins_surface.get_height())), pygame.SRCALPHA)

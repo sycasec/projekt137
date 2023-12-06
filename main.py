@@ -65,11 +65,13 @@ class KeyboardSplatoon():
         self.server = None
         self.client = None
 
+        self.color = None
+
     def encode_game_state(self, delimiter="$"):
         """Takes the current keyboard and player scores and encodes them in a delimited string
 
         Returns:
-            str: delimited string containing the colors of each key, 
+            str: delimited string containing the colors of each key,
                 the green player's score, and the red player's score
         """
         keys = self.keys.get_key_colors()
@@ -81,7 +83,7 @@ class KeyboardSplatoon():
         game_state.append(str(scores[self.scores.RED].value))
 
         return delimiter.join(game_state)
-    
+
     def decode_game_state(self, game_state, delimiter="$"):
         keys, green_score, red_score = game_state.split(delimiter)
         self.keys.set_key_colors_from_string(keys)
@@ -111,12 +113,15 @@ class KeyboardSplatoon():
 
     def receive_keyboard_state(self, s):
         self.scores.reset_scores()
+        self.timer_bar.reset()
         self.keys.set_key_colors_from_string(s)
 
     def begin_game(self):
         if self.server is not None:
             self.client.send(self.keys.get_key_colors().encode())
-            
+            self.color = "GREEN"
+        else:
+            self.color = "RED"
         self.active_screen = "countdown"
         self.screen_handler.begin_countdown()
 
@@ -133,10 +138,14 @@ class KeyboardSplatoon():
         self.timer_bar.draw(self.screen)
         self.scores.draw(self.screen)
 
+        if self.timer_bar.is_done():
+            winner = self.scores.publish_winner()
+
+            self.keys.set_key_colors_from_string(winner * 26)
+            self.client.send(self.encode_game_state())
+
         for k in self.k_dict.values():
             k.draw(self.screen)
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            self.active_screen = "home"
 
         # End the game if all keys are the same color
         if all(
@@ -145,12 +154,18 @@ class KeyboardSplatoon():
             ):
             self.active_screen = "gameover"
             self.winner = "GREEN"
-        if all(
+        elif all(
                 key.target_color == Key.key_red_color
                 for key in self.k_dict.values()
             ):
             self.active_screen = "gameover"
             self.winner = "RED"
+        elif all(
+                key.target_color == Key.key_default_color
+                for key in self.k_dict.values()
+            ):
+            self.active_screen = "gameover"
+            self.winner = "TIE"
 
     def run(self):        
         while True:
@@ -189,7 +204,17 @@ class KeyboardSplatoon():
                 self.play(event)
 
             else:
-                self.active_screen = self.screen_handler.switch_screen(self.active_screen,event,self.winner, self.client_type, self.host_address)
+                kwargs = {}
+                if self.active_screen in ("about", "gameover"):
+                    kwargs.update({'event':event})
+                if self.active_screen == "gameover":
+                    kwargs.update({"winner":self.winner})
+                if self.active_screen == "countdown":
+                    kwargs.update({"color":self.color})
+                if self.active_screen == "waiting":
+                    kwargs.update({"client_type": self.client_type, "ip_address": self.host_address})
+
+                self.active_screen = self.screen_handler.switch_screen(self.active_screen, **kwargs)
 
                 if self.active_screen == "host":
                     self.server = myServer()
@@ -222,7 +247,8 @@ class KeyboardSplatoon():
                         self.is_client_initialized = True
 
                 elif self.active_screen == "rematch":
-                    self.scores.reset_scores()   # Generate new starting colors
+                    self.scores.reset_scores()
+                    self.timer_bar.reset()
                     self.keys.randomize_key_colors()
                     self.client.send(self.keys.get_key_colors().encode())
 

@@ -95,7 +95,7 @@ class Waiting:
                 self.bounce_directions[i] *= -1
     
     
-    def render(self, screen, client_type, ip_address, event):
+    def render(self, screen, client_type, ip_address):
         self.ip_address_display(client_type, ip_address)
         
         screen.fill((255, 255, 255))

@@ -22,6 +22,9 @@ class Timer:
     def reset(self):
         self.current_time = self.max_time
 
+    def is_done(self):
+        return self.current_time <= 0
+
     def draw(self, surface):
         # Draw text
         text_surface = self.font.render("TIMER", True, (0, 0, 0))
