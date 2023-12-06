@@ -67,6 +67,10 @@ class KeyboardSplatoon():
 
         self.color = None
 
+        self.multiplier = 1
+
+        self.moves = [None] * 3
+
     def encode_game_state(self, delimiter="$"):
         """Takes the current keyboard and player scores and encodes them in a delimited string
 
@@ -94,7 +98,7 @@ class KeyboardSplatoon():
     # Network actions
     def receive_keypress(self,key):
         try:
-            key_obj = self.k_dict[key]
+            key_obj:Key = self.k_dict[key]
         except KeyError:
             return
 
@@ -104,12 +108,29 @@ class KeyboardSplatoon():
         # Ex. scores are 200-150, even if you just spammed Q there's a slight bias to green
         # This can be seemingly fixed by reducing Key.t_duration to 100
 
+        self.moves.pop(0)
+        self.moves.append(key_obj.target_color)
+
+        if self.color == "GREEN":
+            if all(x ==  key_obj.key_green_color for x in self.moves):
+                self.multiplier += 1
+                self.moves = self.moves = [None] * 3
+
+        else:
+            if all(x ==  key_obj.key_red_color for x in self.moves):
+                self.multiplier += 1
+                self.moves = [None] * 3
+
         to_add = 0
         if key_obj.target_color == key_obj.key_green_color:
+            if self.color == "RED":
+                self.multiplier = 1
             to_add = self.scores.GREEN
         elif key_obj.target_color == key_obj.key_red_color:
+            if self.color == "GREEN":
+                self.multiplier = 1
             to_add = self.scores.RED
-        self.scores.add_score(to_add)
+        self.scores.add_score(to_add,10*self.multiplier)
 
     def receive_keyboard_state(self, s):
         self.scores.reset_scores()
