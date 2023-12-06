@@ -18,7 +18,7 @@ class myClient:
         t_receive = threading.Thread(target=self.broadcast_receiver)
         t_receive.daemon = True
         t_receive.start()
-
+                
     def broadcast_receiver(self):
         while True:
             s_msg_bin = self.s.recv(1024)
@@ -29,7 +29,6 @@ class myClient:
                 s_msg = pickle.loads(s_msg_bin)
 
             self.on_receive(s_msg)
-
 
     def send(self, data):
         try:

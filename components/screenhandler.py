@@ -35,8 +35,7 @@ class ScreenHandler():
             return self.about(kwargs["event"])
 
         if active_screen == "waiting":
-            return self.waiting()
-
+            return self.waiting(kwargs["client_type"], kwargs["ip_address"])
 
         if active_screen == "countdown":
             return self.countdown(kwargs["color"])
@@ -61,6 +60,12 @@ class ScreenHandler():
             return "quit"
 
         return self.home()
+    
+    def update_waiting(self, event):
+        self.waiting_screen.handle_event(event)
+        
+    def get_host(self):
+        return self.waiting_screen.get_final_ip()
 
     def home(self):
         self.home_screen.render(self.screen)
@@ -82,10 +87,12 @@ class ScreenHandler():
     def join(self):
         return "join"
 
-    def waiting(self):
+    def waiting(self, client_type, ip_address, event):
+        self.waiting_screen.ip_address_display(client_type, ip_address)
+        
         self.waiting_screen.update()
-        self.waiting_screen.render(self.screen)
-
+        self.waiting_screen.render(self.screen, client_type, ip_address, event)
+            
         return "waiting"
 
     def begin_countdown(self):
