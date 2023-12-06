@@ -87,11 +87,11 @@ class ScreenHandler():
     def join(self):
         return "join"
 
-    def waiting(self, client_type, ip_address, event):
+    def waiting(self, client_type, ip_address):
         self.waiting_screen.ip_address_display(client_type, ip_address)
         
         self.waiting_screen.update()
-        self.waiting_screen.render(self.screen, client_type, ip_address, event)
+        self.waiting_screen.render(self.screen, client_type, ip_address)
             
         return "waiting"
 
