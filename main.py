@@ -69,7 +69,7 @@ class KeyboardSplatoon():
 
         self.multiplier = 1
 
-        self.moves = [None] * 3
+        self.moves = "DDD"
 
     def encode_game_state(self, delimiter="$"):
         """Takes the current keyboard and player scores and encodes them in a delimited string
@@ -95,42 +95,41 @@ class KeyboardSplatoon():
         self.scores.set_score(self.scores.GREEN, int(green_score))
         self.scores.set_score(self.scores.RED, int(red_score))
 
+    def increment_combo(self, key_obj):
+        if key_obj.target_color == key_obj.key_green_color:
+            new_key_color = "G"
+        elif key_obj.target_color == key_obj.key_red_color:
+            new_key_color = "R"
+        else:
+            new_key_color = "D"
+        # Append new color to list of moves
+        self.moves = self.moves[1:] + new_key_color
+
+        if (self.color == "GREEN" and self.moves == "GGG") or (
+            self.color == "RED" and self.moves == "RRR"
+        ):
+            self.multiplier += 1
+            self.moves = "DDD"
+        elif (self.color == "GREEN" and new_key_color != "G") or (
+            self.color == "RED" and new_key_color != "R"
+        ):
+            self.multiplier = 1
+
     # Network actions
-    def receive_keypress(self,key):
+    def receive_keypress(self, key):
         try:
-            key_obj:Key = self.k_dict[key]
+            key_obj: Key = self.k_dict[key]
         except KeyError:
             return
 
         key_obj.on_key_press()
-        # TODO: If you press one key extremely fast, sometimes one player
-        # will get multiple points per color toggle.
-        # Ex. scores are 200-150, even if you just spammed Q there's a slight bias to green
-        # This can be seemingly fixed by reducing Key.t_duration to 100
+        self.increment_combo(key_obj)
 
-        self.moves.pop(0)
-        self.moves.append(key_obj.target_color)
-
-        if self.color == "GREEN":
-            if all(x ==  key_obj.key_green_color for x in self.moves):
-                self.multiplier += 1
-                self.moves = self.moves = [None] * 3
-
-        else:
-            if all(x ==  key_obj.key_red_color for x in self.moves):
-                self.multiplier += 1
-                self.moves = [None] * 3
-
-        to_add = 0
         if key_obj.target_color == key_obj.key_green_color:
-            if self.color == "RED":
-                self.multiplier = 1
             to_add = self.scores.GREEN
         elif key_obj.target_color == key_obj.key_red_color:
-            if self.color == "GREEN":
-                self.multiplier = 1
             to_add = self.scores.RED
-        self.scores.add_score(to_add,10*self.multiplier)
+        self.scores.add_score(to_add, 10 * self.multiplier)
 
     def receive_keyboard_state(self, s):
         self.scores.reset_scores()
