@@ -17,13 +17,14 @@ class Countdown:
 
     def choose_color(self, color):
         if color == "RED":
-            self.color = ("R", (224, 102, 102))
+            self.color = ("RED", (224, 102, 102))
 
         if color == "GREEN":
-            self.color = ("G", (102, 224, 102))
+            self.color = ("GREEN", (102, 224, 102))
 
     def text(self):
         self.title_font = pygame.font.Font(pygame.font.get_default_font(), self.title_font_size)
+        self.text_font = pygame.font.Font(pygame.font.get_default_font(), self.text_font_size)
         color, color_rgb = self.color
 
         you_are_text = "You are "
@@ -32,13 +33,27 @@ class Countdown:
         assigned_color_text = f"{color}"
         color_surface = self.title_font.render(assigned_color_text, True, color_rgb)
 
-        self.title_surface = pygame.Surface((you_are_surface.get_width() + color_surface.get_width(), max(you_are_surface.get_height(), color_surface.get_height())), pygame.SRCALPHA)
+        helper_text = f"Press the {'GREEN' if color == 'RED' else 'RED'} keys to win!"
+        helper_surface = self.text_font.render(helper_text, True, "Black")
+
+
+        self.title_surface = pygame.Surface(
+            (
+                max(
+                    you_are_surface.get_width() + color_surface.get_width(), 
+                    helper_surface.get_width()
+                ), 
+                max(you_are_surface.get_height(), color_surface.get_height()) 
+                + helper_surface.get_height()
+            ), 
+            pygame.SRCALPHA
+            )
         self.title_surface.set_colorkey(None)
         self.title_surface.blit(you_are_surface, (0, 0))
         self.title_surface.blit(color_surface, (you_are_surface.get_width(), 0))
+        self.title_surface.blit(helper_surface, (0, max(you_are_surface.get_height(), color_surface.get_height())))
 
 
-        self.text_font = pygame.font.Font(pygame.font.get_default_font(), self.text_font_size)
         text = "Game starting in"
         self.text_surface = self.text_font.render(text, True, "Black")
 
@@ -54,7 +69,7 @@ class Countdown:
         screen.fill((255, 255, 255))
         # Display "Game starting in"
         text_rect = self.text_surface.get_rect(center=(self.screen_width // 2, self.screen_height // 2 - self.countdown_font_size // 2))
-        title_rect = self.text_surface.get_rect(center=((self.screen_width - 40) // 2, (self.screen_height - 250) // 2))
+        title_rect = self.text_surface.get_rect(center=((self.screen_width - 100) // 2, (self.screen_height - 450) // 2))
         screen.blit(self.text_surface, text_rect)
         screen.blit(self.title_surface,title_rect)
 
