@@ -1,5 +1,5 @@
 import pygame
-import sys
+import os
 
 class SplashScreen:
     def __init__(self, screen_width, screen_height, font):
@@ -16,6 +16,7 @@ class SplashScreen:
 
     def animate_lines(self, screen):
         if self.current_line < len(self.lines):
+            
             current_time = pygame.time.get_ticks()
             elapsed_time = current_time - self.start_time
             characters_to_show = min(int(elapsed_time / (1000 / self.typing_speed)), len(self.lines[self.current_line]))
@@ -25,6 +26,7 @@ class SplashScreen:
 
             text_rect = text_surface.get_rect(center=(self.screen_width // 2, self.screen_height // 2))
             screen.blit(text_surface, text_rect)
+    
 
             if characters_to_show == len(self.lines[self.current_line]):
                 if current_time - self.start_time > self.pause_duration:
@@ -33,14 +35,15 @@ class SplashScreen:
                     if self.current_line == len(self.lines) - 1 and not self.square_animation_started:
                         self.start_square_animation()
 
+
     def start_square_animation(self):
         square_sizes = [36, 24, 18]
+
         container_width = sum(square_sizes) + 2 * 10
         container_height = max(square_sizes)
 
         container_x_position = self.screen_width // 2 - container_width // 2
         container_y_position = self.screen_height // 2
-
         self.container = pygame.Rect(container_x_position, container_y_position, container_width, container_height)
 
         squares_total_width = sum(square_sizes) + 2 * 10
@@ -53,7 +56,7 @@ class SplashScreen:
         ]
 
         self.current_square_index = 0
-        self.square_change_interval = 200  # Increased the animation speed
+        self.square_change_interval = 60
         self.bounce_directions = [1, -1, 1]
         self.square_animation_started = True
 
@@ -63,12 +66,12 @@ class SplashScreen:
         if self.square_animation_elapsed < self.square_animation_duration:
             self.square_change_interval -= 1
             if self.square_change_interval == 0:
-                self.square_change_interval = 200  
+                self.square_change_interval = 30  
                 self.current_square_index = (self.current_square_index + 1) % len(self.squares)
 
             for i, square in enumerate(self.squares):
-                square.width -= self.bounce_directions[i]
-                square.height -= self.bounce_directions[i]
+                square.width -= 2 * self.bounce_directions[i] 
+                square.height -= 2 * self.bounce_directions[i] 
 
                 if square.width > 36 or square.width < 10:
                     self.bounce_directions[i] *= -1
