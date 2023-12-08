@@ -156,7 +156,7 @@ class KeyboardSplatoon():
         dt = GAME_CLOCK.tick(60) / 1000.0
         self.timer_bar.update(dt)
         self.timer_bar.draw(self.screen)
-        self.scores.draw(self.screen)
+        self.scores.draw(self.screen, self.color, self.multiplier)
 
         if self.timer_bar.is_done():
             winner = self.scores.publish_winner()
@@ -218,7 +218,6 @@ class KeyboardSplatoon():
                         if event.key == pygame.K_RETURN:
                             self.host_address = self.screen_handler.get_host()
                             print("Connecting to host", self.screen_handler.get_host())
-
 
             if self.active_screen == "play":
                 self.play(event)
