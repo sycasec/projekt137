@@ -1,9 +1,11 @@
+import pygame
 from screens.home import HomeScreen
 from screens.about import AboutScreen
 from screens.loading import Waiting
 from screens.assignment import ColorAssignment
 from screens.countdown import Countdown
 from screens.gameover import GameOver
+from screens.splash import SplashScreen
 
 
 class ScreenHandler():
@@ -12,6 +14,7 @@ class ScreenHandler():
         self.screen = screen
 
         #Screens
+        self.splash_screen = SplashScreen(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
         self.home_screen = HomeScreen(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
         self.about_screen = AboutScreen(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
         self.assignment_screen = ColorAssignment(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
@@ -21,7 +24,9 @@ class ScreenHandler():
 
     #Method to switch to a screen
     def switch_screen(self, active_screen, **kwargs):
-
+        if active_screen == "splash":
+            return self.splash()
+        
         if active_screen == "home":
             return self.home()
 
@@ -30,6 +35,9 @@ class ScreenHandler():
 
         if active_screen == "join":
             return self.join()
+        
+        if active_screen == "quit":
+            return self.quit()
 
         if active_screen == "about":
             return self.about(kwargs["event"])
@@ -66,7 +74,11 @@ class ScreenHandler():
         
     def get_host(self):
         return self.waiting_screen.get_final_ip()
-
+    
+    def splash(self):
+        if self.splash_screen.render(self.screen):
+            return "home"
+        
     def home(self):
         self.home_screen.render(self.screen)
         return "home"
@@ -111,3 +123,7 @@ class ScreenHandler():
         if result == "rematch":
             return "rematch"
         return "gameover"
+    
+    def quit(self):
+        pygame.quit()
+        exit()

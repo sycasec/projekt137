@@ -54,7 +54,7 @@ class KeyboardSplatoon():
 
         #Scren handler
         self.screen_handler = ScreenHandler(self.screen,WINDOW_WIDTH,WINDOW_HEIGHT,self.keys_font)
-        self.active_screen = "home"
+        self.active_screen = "splash"
         self.winner = None
         
         self.client_type = None
