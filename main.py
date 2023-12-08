@@ -2,6 +2,7 @@
 
 import pygame
 import random
+import time
 
 from components.keys import Key, KeyHelper
 from components.background import Background
@@ -55,16 +56,22 @@ class KeyboardSplatoon():
         self.screen_handler = ScreenHandler(self.screen,WINDOW_WIDTH,WINDOW_HEIGHT,self.keys_font)
         self.active_screen = "home"
         self.winner = None
-
+        
+        self.client_type = None
+        self.host_address = None
+        self.is_client_initialized = False
+        
         #Network attributes
         self.server = None
         self.client = None
+
+        self.color = None
 
     def encode_game_state(self, delimiter="$"):
         """Takes the current keyboard and player scores and encodes them in a delimited string
 
         Returns:
-            str: delimited string containing the colors of each key, 
+            str: delimited string containing the colors of each key,
                 the green player's score, and the red player's score
         """
         keys = self.keys.get_key_colors()
@@ -76,7 +83,7 @@ class KeyboardSplatoon():
         game_state.append(str(scores[self.scores.RED].value))
 
         return delimiter.join(game_state)
-    
+
     def decode_game_state(self, game_state, delimiter="$"):
         keys, green_score, red_score = game_state.split(delimiter)
         self.keys.set_key_colors_from_string(keys)
@@ -106,11 +113,15 @@ class KeyboardSplatoon():
 
     def receive_keyboard_state(self, s):
         self.scores.reset_scores()
+        self.timer_bar.reset()
         self.keys.set_key_colors_from_string(s)
 
     def begin_game(self):
         if self.server is not None:
             self.client.send(self.keys.get_key_colors().encode())
+            self.color = "GREEN"
+        else:
+            self.color = "RED"
         self.active_screen = "countdown"
         self.screen_handler.begin_countdown()
 
@@ -127,10 +138,14 @@ class KeyboardSplatoon():
         self.timer_bar.draw(self.screen)
         self.scores.draw(self.screen)
 
+        if self.timer_bar.is_done():
+            winner = self.scores.publish_winner()
+
+            self.keys.set_key_colors_from_string(winner * 26)
+            self.client.send(self.encode_game_state())
+
         for k in self.k_dict.values():
             k.draw(self.screen)
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            self.active_screen = "home"
 
         # End the game if all keys are the same color
         if all(
@@ -139,14 +154,20 @@ class KeyboardSplatoon():
             ):
             self.active_screen = "gameover"
             self.winner = "GREEN"
-        if all(
+        elif all(
                 key.target_color == Key.key_red_color
                 for key in self.k_dict.values()
             ):
             self.active_screen = "gameover"
             self.winner = "RED"
+        elif all(
+                key.target_color == Key.key_default_color
+                for key in self.k_dict.values()
+            ):
+            self.active_screen = "gameover"
+            self.winner = "TIE"
 
-    def run(self):
+    def run(self):        
         while True:
             if self.active_screen == "quit":
                 pygame.quit()
@@ -168,12 +189,32 @@ class KeyboardSplatoon():
                     # --------------------------------- EXPERIMENTAL --------------------------------
                 if self.active_screen == "home":
                     self.active_screen = self.screen_handler.update_home(event)
+                
+                # Handle entering of IP address for waiting client
+                if self.active_screen == "waiting" and self.client_type == "client":
+                    if event.type == pygame.KEYDOWN:
+                        self.screen_handler.update_waiting(event)
+                        
+                        if event.key == pygame.K_RETURN:
+                            self.host_address = self.screen_handler.get_host()
+                            print("Connecting to host", self.screen_handler.get_host())
 
+                                                                
             if self.active_screen == "play":
                 self.play(event)
 
             else:
-                self.active_screen = self.screen_handler.switch_screen(self.active_screen,event,self.winner)
+                kwargs = {}
+                if self.active_screen in ("about", "gameover"):
+                    kwargs.update({'event':event})
+                if self.active_screen == "gameover":
+                    kwargs.update({"winner":self.winner})
+                if self.active_screen == "countdown":
+                    kwargs.update({"color":self.color})
+                if self.active_screen == "waiting":
+                    kwargs.update({"client_type": self.client_type, "ip_address": self.host_address})
+
+                self.active_screen = self.screen_handler.switch_screen(self.active_screen, **kwargs)
 
                 if self.active_screen == "host":
                     self.server = myServer()
@@ -183,19 +224,31 @@ class KeyboardSplatoon():
                         receive_game_state=self.decode_game_state,
                         begin_game=self.begin_game
                     )
+                    
+                    self.client_type = "host"
                     self.active_screen = "waiting"
+                    self.host_address = self.server.hostAddress
 
-                elif self.active_screen == "join":
-                    self.client = GameClient(
-                        receive_keypress=self.receive_keypress,
-                        receive_keyboard_state=self.receive_keyboard_state,
-                        receive_game_state=self.decode_game_state,
-                        begin_game=self.begin_game
-                    )
+                elif self.active_screen == "join":                    
+                    self.client_type = "client"
                     self.active_screen = "waiting"
+                
+                # Handle waiting client. Wait for user input on host address
+                elif self.client_type == "client" and self.active_screen == "waiting":
+                    # Ensure GameClient is run only once
+                    if self.host_address != None and not self.is_client_initialized:
+                        self.client = GameClient(
+                            host=self.host_address,
+                            receive_keypress=self.receive_keypress,
+                            receive_keyboard_state=self.receive_keyboard_state,
+                            receive_game_state=self.decode_game_state,
+                            begin_game=self.begin_game
+                        )
+                        self.is_client_initialized = True
 
                 elif self.active_screen == "rematch":
-                    self.scores.reset_scores()   # Generate new starting colors
+                    self.scores.reset_scores()
+                    self.timer_bar.reset()
                     self.keys.randomize_key_colors()
                     self.client.send(self.keys.get_key_colors().encode())
 
