@@ -56,16 +56,20 @@ class KeyboardSplatoon():
         self.screen_handler = ScreenHandler(self.screen,WINDOW_WIDTH,WINDOW_HEIGHT,self.keys_font)
         self.active_screen = "home"
         self.winner = None
-        
+
         self.client_type = None
         self.host_address = None
         self.is_client_initialized = False
-        
+
         #Network attributes
         self.server = None
         self.client = None
 
         self.color = None
+
+        self.multiplier = 1
+
+        self.moves = "DDD"
 
     def encode_game_state(self, delimiter="$"):
         """Takes the current keyboard and player scores and encodes them in a delimited string
@@ -91,25 +95,41 @@ class KeyboardSplatoon():
         self.scores.set_score(self.scores.GREEN, int(green_score))
         self.scores.set_score(self.scores.RED, int(red_score))
 
+    def increment_combo(self, key_obj):
+        if key_obj.target_color == key_obj.key_green_color:
+            new_key_color = "G"
+        elif key_obj.target_color == key_obj.key_red_color:
+            new_key_color = "R"
+        else:
+            new_key_color = "D"
+        # Append new color to list of moves
+        self.moves = self.moves[1:] + new_key_color
+
+        if (self.color == "GREEN" and self.moves == "GGG") or (
+            self.color == "RED" and self.moves == "RRR"
+        ):
+            self.multiplier += 1
+            self.moves = "DDD"
+        elif (self.color == "GREEN" and new_key_color != "G") or (
+            self.color == "RED" and new_key_color != "R"
+        ):
+            self.multiplier = 1
+
     # Network actions
-    def receive_keypress(self,key):
+    def receive_keypress(self, key):
         try:
-            key_obj = self.k_dict[key]
+            key_obj: Key = self.k_dict[key]
         except KeyError:
             return
 
         key_obj.on_key_press()
-        # TODO: If you press one key extremely fast, sometimes one player
-        # will get multiple points per color toggle.
-        # Ex. scores are 200-150, even if you just spammed Q there's a slight bias to green
-        # This can be seemingly fixed by reducing Key.t_duration to 100
+        self.increment_combo(key_obj)
 
-        to_add = 0
         if key_obj.target_color == key_obj.key_green_color:
             to_add = self.scores.GREEN
         elif key_obj.target_color == key_obj.key_red_color:
             to_add = self.scores.RED
-        self.scores.add_score(to_add)
+        self.scores.add_score(to_add, 10 * self.multiplier)
 
     def receive_keyboard_state(self, s):
         self.scores.reset_scores()
@@ -119,9 +139,6 @@ class KeyboardSplatoon():
     def begin_game(self):
         if self.server is not None:
             self.client.send(self.keys.get_key_colors().encode())
-            self.color = "GREEN"
-        else:
-            self.color = "RED"
         self.active_screen = "countdown"
         self.screen_handler.begin_countdown()
 
@@ -136,7 +153,7 @@ class KeyboardSplatoon():
         dt = GAME_CLOCK.tick(60) / 1000.0
         self.timer_bar.update(dt)
         self.timer_bar.draw(self.screen)
-        self.scores.draw(self.screen)
+        self.scores.draw(self.screen, self.color, self.multiplier)
 
         if self.timer_bar.is_done():
             winner = self.scores.publish_winner()
@@ -167,7 +184,7 @@ class KeyboardSplatoon():
             self.active_screen = "gameover"
             self.winner = "TIE"
 
-    def run(self):        
+    def run(self):
         while True:
             if self.active_screen == "quit":
                 pygame.quit()
@@ -189,17 +206,16 @@ class KeyboardSplatoon():
                     # --------------------------------- EXPERIMENTAL --------------------------------
                 if self.active_screen == "home":
                     self.active_screen = self.screen_handler.update_home(event)
-                
+
                 # Handle entering of IP address for waiting client
                 if self.active_screen == "waiting" and self.client_type == "client":
                     if event.type == pygame.KEYDOWN:
                         self.screen_handler.update_waiting(event)
-                        
+
                         if event.key == pygame.K_RETURN:
                             self.host_address = self.screen_handler.get_host()
                             print("Connecting to host", self.screen_handler.get_host())
 
-                                                                
             if self.active_screen == "play":
                 self.play(event)
 
@@ -212,8 +228,11 @@ class KeyboardSplatoon():
                 if self.active_screen == "countdown":
                     kwargs.update({"color":self.color})
                 if self.active_screen == "waiting":
-                    kwargs.update({"client_type": self.client_type, "ip_address": self.host_address})
+                    kwargs.update({"client_type": self.client_type, 
+                                   "ip_address": self.host_address,
+                                   "color": self.color})
 
+                # time.sleep(0.03)
                 self.active_screen = self.screen_handler.switch_screen(self.active_screen, **kwargs)
 
                 if self.active_screen == "host":
@@ -224,15 +243,16 @@ class KeyboardSplatoon():
                         receive_game_state=self.decode_game_state,
                         begin_game=self.begin_game
                     )
-                    
+                    self.color = "GREEN"
                     self.client_type = "host"
                     self.active_screen = "waiting"
                     self.host_address = self.server.hostAddress
 
-                elif self.active_screen == "join":                    
+                elif self.active_screen == "join":
+                    self.color = "RED"
                     self.client_type = "client"
                     self.active_screen = "waiting"
-                
+
                 # Handle waiting client. Wait for user input on host address
                 elif self.client_type == "client" and self.active_screen == "waiting":
                     # Ensure GameClient is run only once
@@ -251,7 +271,7 @@ class KeyboardSplatoon():
                     self.timer_bar.reset()
                     self.keys.randomize_key_colors()
                     self.client.send(self.keys.get_key_colors().encode())
-
+                    self.multiplier = 1
                     self.active_screen = "play"
 
             pygame.display.update()
