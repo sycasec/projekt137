@@ -139,9 +139,6 @@ class KeyboardSplatoon():
     def begin_game(self):
         if self.server is not None:
             self.client.send(self.keys.get_key_colors().encode())
-            self.color = "GREEN"
-        else:
-            self.color = "RED"
         self.active_screen = "countdown"
         self.screen_handler.begin_countdown()
 
@@ -231,8 +228,11 @@ class KeyboardSplatoon():
                 if self.active_screen == "countdown":
                     kwargs.update({"color":self.color})
                 if self.active_screen == "waiting":
-                    kwargs.update({"client_type": self.client_type, "ip_address": self.host_address})
+                    kwargs.update({"client_type": self.client_type, 
+                                   "ip_address": self.host_address,
+                                   "color": self.color})
 
+                # time.sleep(0.03)
                 self.active_screen = self.screen_handler.switch_screen(self.active_screen, **kwargs)
 
                 if self.active_screen == "host":
@@ -243,12 +243,13 @@ class KeyboardSplatoon():
                         receive_game_state=self.decode_game_state,
                         begin_game=self.begin_game
                     )
-
+                    self.color = "GREEN"
                     self.client_type = "host"
                     self.active_screen = "waiting"
                     self.host_address = self.server.hostAddress
 
                 elif self.active_screen == "join":
+                    self.color = "RED"
                     self.client_type = "client"
                     self.active_screen = "waiting"
 
