@@ -11,8 +11,29 @@ class Score:
     def add_score(self, new_value):
         self.value += new_value
 
-    def draw(self, screen):
-        t_surf = self.font.render(str(self.value), True, self.color)
+    def draw(self, screen, is_player, multiplier):
+        
+        if is_player:
+            # set necessary shit for multipliers
+            multiplier_str = 'x' + str(multiplier)
+            mult_font = pygame.font.Font(pygame.font.get_default_font(), 15 + 5*multiplier) # bigger multiplier, larger font
+            mult_surf = mult_font.render(multiplier_str, True, "White")
+            mult_rect = mult_surf.get_rect(center=(self.x-27-2*multiplier, self.y-20-2*multiplier))
+            
+            t_surf = self.font.render(str(self.value), True, "White")
+            rect_surf = pygame.Rect(self.x-35, self.y-13, 100, 50)        
+            
+            # Draw surfaces
+            pygame.draw.rect(screen, self.color, rect_surf.inflate(15, 15), border_radius=10)
+            
+            pygame.draw.circle(screen, "White", (self.x-27-2*multiplier, self.y-20-2*multiplier), 25 + 3*multiplier)
+            pygame.draw.circle(screen, self.color, (self.x-27-2*multiplier, self.y-20-2*multiplier), 20 + 3*multiplier)
+            
+            screen.blit(mult_surf, mult_rect)
+            
+        else:
+            t_surf = self.font.render(str(self.value), True, self.color)
+            
         t_rect = t_surf.get_rect(center=(self.x + self.score_rect_size // 2, self.y + self.score_rect_size // 2))
         screen.blit(t_surf, t_rect)
 
@@ -67,6 +88,7 @@ class ScoreHelper:
         else:
             return self.TIE
 
-    def draw(self, screen):
-        for score in self.scores.values():
-            score.draw(screen)
+    def draw(self, screen, player, multiplier):
+        player = player[0]
+        for key, score in self.scores.items():
+            score.draw(screen, is_player = key==player, multiplier=multiplier)
