@@ -77,6 +77,9 @@ class KeyboardSplatoon():
 
         #Sound
         mixer.music.load('assets/sounds/bg.mp3')
+        mixer.music.set_volume(0.1)
+        mixer.music.play(-1)
+        mixer.music.set_pos(10.4)
 
         self.combo = pygame.mixer.Sound("assets\sounds\combo.wav")
         
@@ -246,7 +249,7 @@ class KeyboardSplatoon():
             
             if self.active_screen == "play":
                 if not mixer.music.get_busy():
-                        mixer.music.set_volume(0.1)
+                        mixer.music.set_volume(0.5)
                         mixer.music.play(-1)
                         mixer.music.set_pos(14)
                 self.play(event)

@@ -94,12 +94,3 @@ class Countdown:
             elapsed_time = time.time() - self.start_time
             return elapsed_time >= self.countdown_duration
         return False
-
-if __name__ == "__main__":
-    pygame.init()
-    screen = pygame.display.set_mode((1125, 800))
-    countdown = Countdown(1125,800,pygame.font.Font(pygame.font.get_default_font(),36))
-    countdown.start_countdown()
-    while True:
-        countdown.render(screen, "RED")
-        pygame.display.update()
