@@ -276,14 +276,17 @@ class KeyboardSplatoon():
                 elif self.client_type == "client" and self.active_screen == "waiting":
                     # Ensure GameClient is run only once
                     if self.host_address != None and not self.is_client_initialized:
-                        self.client = GameClient(
-                            host=self.host_address,
-                            receive_keypress=self.receive_keypress,
-                            receive_keyboard_state=self.receive_keyboard_state,
-                            receive_game_state=self.decode_game_state,
-                            begin_game=self.begin_game
-                        )
-                        self.is_client_initialized = True
+                        try:
+                            self.client = GameClient(
+                                host=self.host_address,
+                                receive_keypress=self.receive_keypress,
+                                receive_keyboard_state=self.receive_keyboard_state,
+                                receive_game_state=self.decode_game_state,
+                                begin_game=self.begin_game
+                            )
+                            self.is_client_initialized = True
+                        except:
+                            self.host_address = None
 
                 elif self.active_screen == "rematch":
                     self.client.send("GAME START".encode())
