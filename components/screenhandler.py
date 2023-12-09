@@ -1,4 +1,3 @@
-import pygame
 from screens.home import HomeScreen
 from screens.about import AboutScreen
 from screens.loading import Waiting
@@ -36,9 +35,6 @@ class ScreenHandler():
         if active_screen == "join":
             return self.join()
         
-        if active_screen == "quit":
-            return self.quit()
-
         if active_screen == "about":
             return self.about(kwargs["event"])
 
@@ -123,7 +119,3 @@ class ScreenHandler():
         if result == "rematch":
             return "rematch"
         return "gameover"
-    
-    def quit(self):
-        pygame.quit()
-        exit()

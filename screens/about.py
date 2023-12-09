@@ -35,26 +35,27 @@ class AboutScreen:
             to “paint” the game’s keyboard in their color before the opponent can do 
             the same 
 
-            Mechanics:
+            
+            MECHANICS:
+
             Each player sees a keyboard where each key is either red or green. 
             When a player presses a key, that key will toggle its color. 
 
-            Win Conditions/Scoring System:
+            
+            WIN CONDITIONS/SCORING SYSTEM:
+
             Whenever a key turns into a player’s color, that player gets 10 points 
             (i.e. if the green player turns a red key into green, they get 10 points). 
-            Pressing multiple keys successively with no mistakes adds a combo 
-            multiplier up to 5x points. Player 1’s goal is to make all keys green, 
-            and player 2’s goal is to make all keys red. If one player succeeds, they 
-            automatically win. If no player succeeds after 10 seconds, the player with 
-            the highest score wins. 
-
-	        If one player manages to cover the entire keyboard in their respective color, 
-            they immediately win. If no player succeeds in this after 10 seconds, the 
-            player with the highest score wins instead.
+            Player 1’s goal is to make all keys green, and player 2’s goal is to make 
+            all keys red. If one player succeeds, they automatically win. If no player 
+            succeeds after 10 seconds, the player with the highest score wins. 
+            If one player manages to cover the entire keyboard in their respective 
+            color, they immediately win. If no player succeeds in this after 10 seconds, 
+            the player with the highest score wins instead.
 
         """
         self.developers_title_y_offset = 30
-        self.developers_text = "  del Castillo, Kyle Adrian\n  Dy, Alwyn\n  Gudito, Justine\n  Modequillo, Jethro\n  Pilpa, Myka Jean\n  Tupa, Sam Bondj\n  Ypanto, Goody Carlo"
+        self.developers_text = "  del Castillo, Kyle Adrian\n  Dy, Alwyn\n  Gudito, Justine\n  Modequillo, Jethro\n  Pilpa, Myka Marie Jean\n  Tupa, Sam Bondj\n  Ypanto, Goody Carlo"
 
         self.title_surface = self.title_font.render(self.title_text, True, "Black")
         self.about_lines = [self.text_font.render(line, True, "Black") for line in self.about_text.split('\n')]
