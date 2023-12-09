@@ -18,7 +18,7 @@ class ScreenHandler():
         self.waiting_screen = Waiting(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
         self.countdown_screen = Countdown(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
         self.gameover_screen = GameOver(WINDOW_WIDTH, WINDOW_HEIGHT, keys_font)
-
+    
     #Method to switch to a screen
     def switch_screen(self, active_screen, **kwargs):
 

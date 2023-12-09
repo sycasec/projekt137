@@ -5,6 +5,7 @@ class AboutScreen:
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.font = font
+        self.button_click = pygame.mixer.Sound("assets/sounds/buttonclick.mp3")
 
         self.containers()
         self.fonts()
@@ -58,8 +59,10 @@ class AboutScreen:
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.back_button_rect.colliderect(pygame.Rect(event.pos, (1, 1))):
+            self.button_click.play()
             return "back"
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            self.button_click.play()
             return "back"
         return None
 
