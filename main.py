@@ -17,6 +17,7 @@ WINDOW_HEIGHT = 800
 FACTOR = 25
 WINDOW_TITLE = "Keyboard Splatoon"
 GAME_CLOCK = pygame.time.Clock()
+pygame.mixer.init()
 
 class KeyboardSplatoon():
     def __init__(self) -> None:
@@ -76,6 +77,8 @@ class KeyboardSplatoon():
         #Sounds
         #self.bg_music = pygame.mixer.Sound('assets/sounds/bg.mp3')
 
+        self.combo = pygame.mixer.Sound("assets\sounds\combo.wav")
+        
     def encode_game_state(self, delimiter="$"):
         """Takes the current keyboard and player scores and encodes them in a delimited string
 
@@ -114,6 +117,7 @@ class KeyboardSplatoon():
             self.color == "RED" and self.moves == "RRR"
         ):
             self.multiplier += 1
+            self.combo.play()
             self.moves = "DDD"
         elif (self.color == "GREEN" and new_key_color != "G") or (
             self.color == "RED" and new_key_color != "R"
