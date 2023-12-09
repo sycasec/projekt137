@@ -54,7 +54,7 @@ class KeyboardSplatoon():
 
         #Scren handler
         self.screen_handler = ScreenHandler(self.screen,WINDOW_WIDTH,WINDOW_HEIGHT,self.keys_font)
-        self.active_screen = "home"
+        self.active_screen = "splash"
         self.winner = None
 
         self.client_type = None
@@ -74,7 +74,7 @@ class KeyboardSplatoon():
         self.is_game_start = False
 
         #Sounds
-        self.bg_music = pygame.mixer.Sound('assets/sounds/bg.mp3')
+        #self.bg_music = pygame.mixer.Sound('assets/sounds/bg.mp3')
 
     def encode_game_state(self, delimiter="$"):
         """Takes the current keyboard and player scores and encodes them in a delimited string
@@ -157,8 +157,7 @@ class KeyboardSplatoon():
 
     #Main Play
     def play(self, event):
-        #self.bg_music.play(loops=-1)
-        #self.bg_music.set_volume(0.6)
+
         for k in self.k_dict.values():
             k.update_color()
 
