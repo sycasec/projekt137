@@ -48,7 +48,6 @@ class KeyboardSplatoon():
         self.keys = KeyHelper(self.keys_font)
         self.keys.gen_keys()
         self.k_dict = self.keys.get_keys()
-        self.keys.randomize_key_colors()
 
         # Score generation
         self.scores = ScoreHelper(self.score_font)
@@ -141,9 +140,16 @@ class KeyboardSplatoon():
 
     def begin_game(self):
         if self.server is not None:
+            self.keys.randomize_key_colors()
             self.client.send(self.keys.get_key_colors().encode())
-        self.active_screen = "countdown"
+            
+        self.scores.reset_scores()
+        self.timer_bar.reset()
+        self.multiplier = 1
         self.is_game_start = True
+        self.multiplier = 1
+        
+        self.active_screen = "countdown"
         self.screen_handler.begin_countdown()
 
     #Main Play
@@ -175,23 +181,25 @@ class KeyboardSplatoon():
             ):
             self.active_screen = "gameover"
             self.winner = "GREEN"
+            self.is_game_start = False
         elif all(
                 key.target_color == Key.key_red_color
                 for key in self.k_dict.values()
             ):
             self.active_screen = "gameover"
             self.winner = "RED"
+            self.is_game_start = False
         elif all(
                 key.target_color == Key.key_default_color
                 for key in self.k_dict.values()
             ):
             self.active_screen = "gameover"
             self.winner = "TIE"
+            self.is_game_start = False
 
     def run(self):
         while True:
             
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -239,10 +247,11 @@ class KeyboardSplatoon():
                                    "ip_address": self.host_address,
                                    "color": self.color})
 
-                # time.sleep(0.03)
-                if self.is_game_start and self.active_screen == "waiting":
+                # fix overriding of active_screen issue
+                if self.is_game_start and (self.active_screen == "waiting"):
                     self.active_screen = "countdown"
                     kwargs.update({"color":self.color})
+
                 self.active_screen = self.screen_handler.switch_screen(self.active_screen, **kwargs)
 
                 if self.active_screen == "host":
@@ -277,14 +286,7 @@ class KeyboardSplatoon():
                         self.is_client_initialized = True
 
                 elif self.active_screen == "rematch":
-                    self.scores.reset_scores()
-                    self.timer_bar.reset()
-                    self.keys.randomize_key_colors()
-                    self.client.send(self.keys.get_key_colors().encode())
-                    self.multiplier = 1
-                    self.active_screen = "play"
-                    
-                
+                    self.client.send("GAME START".encode())
 
             pygame.display.update()
             GAME_CLOCK.tick(60)
