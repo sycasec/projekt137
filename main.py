@@ -3,6 +3,7 @@
 import pygame
 import random
 import time
+import sys
 
 from components.keys import Key, KeyHelper
 from components.background import Background
@@ -189,9 +190,7 @@ class KeyboardSplatoon():
 
     def run(self):
         while True:
-            if self.active_screen == "quit":
-                pygame.quit()
-                exit()
+            
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -218,7 +217,12 @@ class KeyboardSplatoon():
                         if event.key == pygame.K_RETURN:
                             self.host_address = self.screen_handler.get_host()
                             print("Connecting to host", self.screen_handler.get_host())
-
+            
+            if self.active_screen == "quit":
+                print("Quitting game")
+                pygame.quit()
+                exit()
+            
             if self.active_screen == "play":
                 self.play(event)
 
@@ -279,6 +283,8 @@ class KeyboardSplatoon():
                     self.client.send(self.keys.get_key_colors().encode())
                     self.multiplier = 1
                     self.active_screen = "play"
+                    
+                
 
             pygame.display.update()
             GAME_CLOCK.tick(60)
