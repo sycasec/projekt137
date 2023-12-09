@@ -5,6 +5,7 @@ import random
 import time
 import sys
 
+from pygame import mixer
 from components.keys import Key, KeyHelper
 from components.background import Background
 from components.timer import Timer
@@ -75,8 +76,8 @@ class KeyboardSplatoon():
         
         self.is_game_start = False
 
-        #Sounds
-        #self.bg_music = pygame.mixer.Sound('assets/sounds/bg.mp3')
+        #Sound
+        mixer.music.load('assets/sounds/bg.mp3')
 
         self.combo = pygame.mixer.Sound("assets\sounds\combo.wav")
         
@@ -214,6 +215,10 @@ class KeyboardSplatoon():
                             print("Something went wrong when sending your keypress")
                     # --------------------------------- EXPERIMENTAL --------------------------------
                 if self.active_screen == "home":
+                    if not mixer.music.get_busy():
+                         mixer.music.set_volume(0.1)
+                         mixer.music.play(-1)
+                         mixer.music.set_pos(14)
                     self.active_screen = self.screen_handler.update_home(event)
 
                 # Handle entering of IP address for waiting client
@@ -231,25 +236,34 @@ class KeyboardSplatoon():
                 exit()
             
             if self.active_screen == "play":
+                if not mixer.music.get_busy():
+                        mixer.music.set_volume(0.1)
+                        mixer.music.play(-1)
+                        mixer.music.set_pos(14)
                 self.play(event)
 
             else:
                 kwargs = {}
                 if self.active_screen in ("about", "gameover"):
                     kwargs.update({'event':event})
+                    mixer.music.stop()
                 if self.active_screen == "gameover":
                     kwargs.update({"winner":self.winner})
+                    mixer.music.stop()
                 if self.active_screen == "countdown":
                     kwargs.update({"color":self.color})
+                    mixer.music.stop()
                 if self.active_screen == "waiting":
                     kwargs.update({"client_type": self.client_type, 
                                    "ip_address": self.host_address,
                                    "color": self.color})
+                    mixer.music.stop()
 
                 # time.sleep(0.03)
                 if self.is_game_start and self.active_screen == "waiting":
                     self.active_screen = "countdown"
                     kwargs.update({"color":self.color})
+                    mixer.music.stop()
                 self.active_screen = self.screen_handler.switch_screen(self.active_screen, **kwargs)
 
                 if self.active_screen == "host":
@@ -264,11 +278,13 @@ class KeyboardSplatoon():
                     self.color = "GREEN"
                     self.client_type = "host"
                     self.host_address = self.server.hostAddress
+                    mixer.music.stop()
 
                 elif self.active_screen == "join":
                     self.color = "RED"
                     self.client_type = "client"
                     self.active_screen = "waiting"
+                    mixer.music.stop()
 
                 # Handle waiting client. Wait for user input on host address
                 elif self.client_type == "client" and self.active_screen == "waiting":
@@ -282,6 +298,7 @@ class KeyboardSplatoon():
                             begin_game=self.begin_game
                         )
                         self.is_client_initialized = True
+                        mixer.music.stop()
 
                 elif self.active_screen == "rematch":
                     self.scores.reset_scores()
@@ -289,6 +306,7 @@ class KeyboardSplatoon():
                     self.keys.randomize_key_colors()
                     self.client.send(self.keys.get_key_colors().encode())
                     self.multiplier = 1
+                    mixer.music.stop()
                     self.active_screen = "play"
                     
                 
