@@ -56,7 +56,7 @@ class KeyboardSplatoon():
         self.screen_handler = ScreenHandler(self.screen,WINDOW_WIDTH,WINDOW_HEIGHT,self.keys_font)
         self.active_screen = "splash"
         self.winner = None
-        
+
         # self.active_screen = "gameover"
         # self.winner = "RED"
 
@@ -73,7 +73,7 @@ class KeyboardSplatoon():
         self.multiplier = 1
 
         self.moves = "DDD"
-        
+
         self.is_game_start = False
 
         #Sound
@@ -92,7 +92,7 @@ class KeyboardSplatoon():
     def gameover_sound(self):
         self.timer_sound.stop()
         self.win_sound.play()
-        
+
     def encode_game_state(self, delimiter="$"):
         """Takes the current keyboard and player scores and encodes them in a delimited string
 
@@ -160,19 +160,25 @@ class KeyboardSplatoon():
         self.timer_bar.reset()
         self.keys.set_key_colors_from_string(s)
 
-    def begin_game(self):
-        if self.server is not None:
-            self.keys.randomize_key_colors()
-            self.client.send(self.keys.get_key_colors().encode())
-            
-        self.scores.reset_scores()
-        self.timer_bar.reset()
-        self.multiplier = 1
-        self.is_game_start = True
-        self.multiplier = 1
-        
-        self.active_screen = "countdown"
-        self.screen_handler.begin_countdown()
+    def event_listener(self,msg):
+        if msg == "GAME START":
+            if self.server is not None:
+                self.keys.randomize_key_colors()
+                self.client.send(self.keys.get_key_colors().encode())
+
+            self.scores.reset_scores()
+            self.timer_bar.reset()
+            self.multiplier = 1
+            self.is_game_start = True
+            self.multiplier = 1
+
+            self.active_screen = "countdown"
+            self.screen_handler.begin_countdown()
+
+        elif msg == "BACK TO HOME":
+            self.active_screen = "home"
+            self.server = None
+            self.client = None
 
     #Main Play
     def play(self, event):
@@ -187,7 +193,7 @@ class KeyboardSplatoon():
         self.timer_bar.update(dt)
         self.timer_bar.draw(self.screen)
         self.scores.draw(self.screen, self.color, self.multiplier)
-        
+
         if self.timer_bar.start_countdown and not self.timer_bar.played_timer_sound:
             self.countdown_channel.play(self.timer_sound)
             self.timer_bar.played_timer_sound = True
@@ -244,23 +250,23 @@ class KeyboardSplatoon():
                         except Exception as e:
                             print("Something went wrong when sending your keypress")
                     # --------------------------------- EXPERIMENTAL --------------------------------
-                if self.active_screen == "home":                   
+                if self.active_screen == "home":
                     self.active_screen = self.screen_handler.update_home(event)
 
                 # Handle entering of IP address for waiting client
                 if self.active_screen == "waiting":
                     if event.type in [pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN]:
                         self.active_screen = self.screen_handler.update_waiting(event, self.client_type)
-                        
+
                         if self.client_type == "client" and event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                             self.host_address = self.screen_handler.get_host()
                             print("Connecting to host", self.screen_handler.get_host())
-                                        
+
             if self.active_screen == "quit":
                 print("Quitting game")
                 pygame.quit()
                 exit()
-            
+
             if self.active_screen == "play":
                 if not mixer.music.get_busy():
                         mixer.music.set_volume(0.25)
@@ -281,7 +287,7 @@ class KeyboardSplatoon():
                     self.countdown_sound.play()
                     mixer.music.stop()
                 if self.active_screen == "waiting":
-                    kwargs.update({"client_type": self.client_type, 
+                    kwargs.update({"client_type": self.client_type,
                                    "ip_address": self.host_address,
                                    "color": self.color})
                     mixer.music.stop()
@@ -292,14 +298,14 @@ class KeyboardSplatoon():
                     kwargs.update({"color":self.color})
                     mixer.music.stop()
                 self.active_screen = self.screen_handler.switch_screen(self.active_screen, **kwargs)
-                
+
                 if self.active_screen == "host":
                     self.server = myServer()
                     self.client = GameClient(
                         receive_keypress=self.receive_keypress,
                         receive_keyboard_state=self.receive_keyboard_state,
                         receive_game_state=self.decode_game_state,
-                        begin_game=self.begin_game
+                        event_listener=self.event_listener
                     )
                     print("Initialized Server")
                     print("Initialized Game Client")
@@ -325,7 +331,7 @@ class KeyboardSplatoon():
                                 receive_keypress=self.receive_keypress,
                                 receive_keyboard_state=self.receive_keyboard_state,
                                 receive_game_state=self.decode_game_state,
-                                begin_game=self.begin_game
+                                event_listener=self.event_listener
                             )
                             self.is_client_initialized = True
                             print("Initialized Game Client")
@@ -338,19 +344,21 @@ class KeyboardSplatoon():
                         self.server.broadcast("GAME START".encode())
                     else:
                         self.client.send("GAME START".encode())
-                
+
                 elif self.active_screen == "home":
                     self.host_address = None
                     self.screen_handler.clear_loading_inputbox()
                     self.is_client_initialized = False
-                    
+
                     if self.server != None:
+                        self.server.broadcast("BACK TO HOME".encode())
                         self.server.kill()
-                        self.server = None
-                    
+
+
                     if self.client != None:
-                        self.client = None
-                    
+                        self.client.send("BACK TO HOME".encode())
+                        self.client.kill()
+
             pygame.display.update()
             GAME_CLOCK.tick(60)
 if __name__ == "__main__":

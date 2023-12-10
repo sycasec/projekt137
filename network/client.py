@@ -13,14 +13,15 @@ class myClient:
         self.host = host
         self.port = port
         self.on_receive = on_receive
+        self.run = True
         self.s.connect((self.host, self.port))
 
-        t_receive = threading.Thread(target=self.broadcast_receiver)
-        t_receive.daemon = True
-        t_receive.start()
-                
+        self.t_receive = threading.Thread(target=self.broadcast_receiver)
+        self.t_receive.daemon = True
+        self.t_receive.start()
+
     def broadcast_receiver(self):
-        while True:
+        while self.run:
             try:
                 s_msg_bin = self.s.recv(1024)
 
@@ -40,12 +41,16 @@ class myClient:
             to_send = pickle.dumps(data)
         self.s.send(to_send)
 
+    def kill(self):
+        self.run = False
+        self.t_receive.join(timeout=5)
+
 class GameClient(myClient):
     def __init__(self,
                  receive_keypress,
                  receive_keyboard_state,
                  receive_game_state,
-                 begin_game,
+                 event_listener,
                  host="localhost",
                  port=7634,
                  on_receive=None
@@ -53,7 +58,7 @@ class GameClient(myClient):
         self.receive_keypress = receive_keypress
         self.receive_keyboard_state = receive_keyboard_state
         self.receive_game_state = receive_game_state
-        self.begin_game = begin_game
+        self.event_listener = event_listener
 
         if on_receive is None:
             on_receive = self.receive_broadcast
@@ -73,8 +78,8 @@ class GameClient(myClient):
 
         elif self.__msg_is_game_state(msg):
             self.receive_game_state(msg)
-        if msg == "GAME START":
-            self.begin_game()
+        else:
+            self.event_listener(msg)
 
     @staticmethod
     def __msg_is_keypress(msg):
@@ -86,7 +91,7 @@ class GameClient(myClient):
             return len(msg) == 26
         except Exception:
             return False
-        
+
     @staticmethod
     def __msg_is_game_state(msg, delimiter="$"):
         try:

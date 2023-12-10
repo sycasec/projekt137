@@ -53,13 +53,13 @@ class myServer:
 
     def kill(self):
         self.serverRun = False
-        
+
         try:
             self.server.shutdown(socket.SHUT_RDWR)
         except:
             pass
         self.server.close()
-        
+
         self.clientList = []
         self.connected_players = 0
 
@@ -72,12 +72,7 @@ class myServer:
                     self.broadcast("GAME START".encode())
                 elif self.status == "WAIT":
                     print("Waiting for client")
-                    rr,rw,err = select.select( [self.server],[],[], 20 )
-                    if rr:
-                        try:
-                            conn, addr = self.server.accept()
-                        except:
-                            pass
+                    conn, addr = self.server.accept()
                     self.on_client_connect(conn, addr)
                 time.sleep(1)
 
