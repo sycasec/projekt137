@@ -23,8 +23,8 @@ python -m virtualenv venv && venv\scripts\activate
 ```
 pip install -r requirements.txt
 ```
-4. On one machine, run `python main.py` to launch the game and press "Initialize Game"
-5. On another machine, repeat steps 1-4 and run `python main.py` to launch the game. Press "Join Game" and type the host's IP address
+5. On one machine, run `python main.py` to launch the game and press "Initialize Game"
+6. On another machine, repeat steps 1-4 and run `python main.py` to launch the game. Press "Join Game" and type the host's IP address
 
 ## Screenshots
 ![Main Menu](<screenshots/Screenshot from 2023-12-10 11-23-47.png>) 
