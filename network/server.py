@@ -40,8 +40,9 @@ class myServer:
     def kill(self):
         self.serverRun = False
         
-        self.server.shutdown(socket.SHUT_RDWR)
-        self.server.close()
+        if self.server.fileno() > 0:
+            self.server.shutdown(socket.SHUT_RDWR)
+            self.server.close()
 
         for x in self.clientList:
             x.close()
@@ -62,9 +63,11 @@ class myServer:
                     print("Waiting for client")
                     rr,rw,err = select.select( [self.server],[],[], 20 )
                     if rr:
-                        conn, addr = self.server.accept()
+                        try:
+                            conn, addr = self.server.accept()
+                        except:
+                            pass
                     self.on_client_connect(conn, addr)
-
                 time.sleep(1)
 
         except KeyboardInterrupt:
@@ -92,16 +95,19 @@ class myServer:
             self.broadcast(c_msg_bin)
 
     def on_client_connect(self, conn, addr):
-        conn.send(f"Welcome, {addr}!".encode())
+        try:
+            conn.send(f"Welcome, {addr}!".encode())
+    
+            print("connected with",addr)
 
-        print("connected with",addr)
+            self.connected_players += 1
 
-        self.connected_players += 1
+            t = threading.Thread(target=self.clientHandler, args=(conn,addr))
+            t.start()
 
-        t = threading.Thread(target=self.clientHandler, args=(conn,addr))
-        t.start()
-
-        self.clientList.append(conn)
+            self.clientList.append(conn)
+        except:
+            self.kill()
 
     def broadcast(self,message):
         for conn in self.clientList:
