@@ -1,5 +1,6 @@
+import os
 import pygame
-import sys
+
 
 class HomeScreen:
     def __init__(self, screen_width, screen_height, font):
@@ -11,7 +12,10 @@ class HomeScreen:
         self.button_spacing = 40  
         self.title_spacing = 50 
         self.selected_button = 0
-    
+        # self.bg_music = pygame.mixer.Sound(os.path.join("assets", "sounds", "bg.mp3")
+        self.button_click = pygame.mixer.Sound(os.path.join("assets", "sounds", "buttonclick.mp3"))
+        self.button_nav = pygame.mixer.Sound(os.path.join("assets", "sounds", "buttonnav.mp3"))
+
         self.title()
         self.menu()
 
@@ -32,13 +36,17 @@ class HomeScreen:
             if event.button == 1:
                 for i, rect in enumerate(self.button_rects):
                     if rect.collidepoint(event.pos):
+                        self.button_click.play()
                         return i
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_DOWN:
+                self.button_nav.play() 
                 self.select_button(1)
             elif event.key == pygame.K_UP:
+                self.button_nav.play() 
                 self.select_button(-1)
-            elif event.key == pygame.K_RETURN: 
+            elif event.key == pygame.K_RETURN:
+                self.button_click.play()
                 return self.selected_button
 
     def select_button(self, dir):
@@ -49,7 +57,6 @@ class HomeScreen:
         screen.blit(self.title_surface, self.title_surface.get_rect(center=(self.screen_width // 2, self.screen_height // 2 - self.title_spacing)))
 
         for i, (rect, surface) in enumerate(zip(self.button_rects, self.button_surfaces)):
-            # Highlight the selected button
             if i == self.selected_button:
                 enlarged_rect = rect.inflate(15, 15)
                 pygame.draw.rect(screen, (217, 217, 217), enlarged_rect, border_radius=10)

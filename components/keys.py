@@ -1,5 +1,8 @@
+import os
 import pygame
 import random
+
+pygame.mixer.init()
 
 class Key:
     t_speed = 0.005
@@ -9,7 +12,7 @@ class Key:
     key_default_color = pygame.Color(199,199,199)
     key_rect_size = 60
     b_rad = 3 
-
+    
     def __init__(self, assigned_key, coords, t_font):
         self.key = assigned_key
         self.x = coords[0]
@@ -19,6 +22,8 @@ class Key:
         self.target_color = start_color
         self.t_timer = 0
         self.font = t_font
+        self.key_press = pygame.mixer.Sound(os.path.join("assets", "sounds", "keypress.mp3"))
+        
 
     def toggle_red(self):
         self.target_color = self.key_red_color
@@ -37,10 +42,13 @@ class Key:
         # change when server-client logic added
         if self.target_color == self.key_default_color:
             self.toggle_green()
+            self.key_press.play()
         elif self.target_color == self.key_red_color:
-            self.toggle_green() 
+            self.toggle_green()
+            self.key_press.play()
         elif self.target_color == self.key_green_color:
             self.toggle_red()
+            self.key_press.play()
 
     def update_color(self):
         elapsed_time = pygame.time.get_ticks() - self.t_timer
@@ -87,7 +95,7 @@ class KeyHelper:
         self.x_inc = 85
         self.font = keys_font
         self.keys_dict = {}
-
+       
     def gen_key_row(self, row):
         kd = {}
         sel_row = self.top_row

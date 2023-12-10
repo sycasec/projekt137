@@ -1,10 +1,13 @@
+import os
 import pygame
+
 
 class AboutScreen:
     def __init__(self, screen_width, screen_height, font):
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.font = font
+        self.button_click = pygame.mixer.Sound(os.path.join("assets", "sounds", "buttonclick.mp3"))
 
         self.containers()
         self.fonts()
@@ -31,25 +34,31 @@ class AboutScreen:
     def text_content(self):
         self.title_text = "ABOUT KEYBOARD SPLATOON"
         self.about_text = """
-            Lorem ipsum dolor sit amet consectetur. Nulla at aenean neque ipsum
-            fringilla egestas. Nulla vitae varius hendrerit vitae dictum volutpat
-            vivamus nunc. Mus etiam etiam ornare eget pretium tincidunt massa.
-            Rutrum donec iaculis ultrices suspendisse feugiat. Lectus scelerisque
-            dolor morbi tempor quis praesent netus elit id. Sit morbi habitant
-            bibendum etiam. Ac consequat amet aliquam tempus viverra fermentum in.
+            Keyboard Splatoon is a multiplayer keyboard-based game where players try 
+            to “paint” the game’s keyboard in their color before the opponent can do 
+            the same 
 
-            Est tortor et etiam consequat facilisis elementum lacinia feugiat.
-            Eu tempor porttitor diam sed dignissim. Ultrices aliquam cras tincidunt
-            sagittis libero eu pharetra nullam. Pretium fusce est et viverra nunc
-            feugiat quis turpis. Eget platea quis vitae fringilla egestas amet.
-            Nibh integer enim quam placerat commodo dictum adipiscing. Leo convallis
-            malesuada aliquet congue aliquet sit. Volutpat nisi a mi facilisis dui
-            vehicula risus arcu consequat. Arcu enim massa aenean id gravida. Donec
-            tristique morbi commodo sagittis pretium ultricies tempor sed. Quis
-            pretium vitae tempor orci congue erat.
+            
+            MECHANICS:
+
+            Each player sees a keyboard where each key is either red or green. 
+            When a player presses a key, that key will toggle its color. 
+
+            
+            WIN CONDITIONS/SCORING SYSTEM:
+
+            Whenever a key turns into a player’s color, that player gets 10 points 
+            (i.e. if the green player turns a red key into green, they get 10 points). 
+            Player 1’s goal is to make all keys green, and player 2’s goal is to make 
+            all keys red. If one player succeeds, they automatically win. If no player 
+            succeeds after 10 seconds, the player with the highest score wins. 
+            If one player manages to cover the entire keyboard in their respective 
+            color, they immediately win. If no player succeeds in this after 10 seconds, 
+            the player with the highest score wins instead.
+
         """
         self.developers_title_y_offset = 30
-        self.developers_text = "  del Castillo, Kyle Adrian\n  Dy, Alwyn\n  Gudito, Justine\n  Modequillo, Jethro\n  Pilpa, Myka Jean\n  Tupa, Sam Bondj\n  Ypanto, Goody Carlo"
+        self.developers_text = "  del Castillo, Kyle Adrian\n  Dy, Alwyn\n  Gudito, Justine\n  Modequillo, Jethro\n  Pilpa, Myka Marie Jean\n  Tupa, Sam Bondj\n  Ypanto, Goody Carlo"
 
         self.title_surface = self.title_font.render(self.title_text, True, "Black")
         self.about_lines = [self.text_font.render(line, True, "Black") for line in self.about_text.split('\n')]
@@ -58,8 +67,10 @@ class AboutScreen:
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.back_button_rect.colliderect(pygame.Rect(event.pos, (1, 1))):
+            self.button_click.play()
             return "back"
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            self.button_click.play()
             return "back"
         return None
 
