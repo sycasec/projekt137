@@ -51,9 +51,9 @@ class GameOver:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.rematch_button_rect.colliderect(pygame.Rect(event.pos, (1, 1))):
+        elif (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.rematch_button_rect.colliderect(pygame.Rect(event.pos, (1, 1)))) or (event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN):
             return "rematch"
-        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.home_button_rect.colliderect(pygame.Rect(event.pos, (1, 1))):
+        elif (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.home_button_rect.colliderect(pygame.Rect(event.pos, (1, 1)))) or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
             return "home"
 
     def render(self, screen, winner):
