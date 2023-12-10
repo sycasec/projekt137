@@ -67,11 +67,11 @@ class Waiting:
         self.bounce_directions = [1, -1, 1] 
 
     def handle_event(self, event, client_type):
-        if event.type == pygame.KEYDOWN and client_type == "client":
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.back_button_rect.colliderect(pygame.Rect(event.pos, (1, 1))) or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+            return "home"
+        elif event.type == pygame.KEYDOWN and client_type == "client":
             self.ip_input_box.handle_event(event)
             return "waiting"
-        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.back_button_rect.colliderect(pygame.Rect(event.pos, (1, 1))):
-            return "home"
         else:
             return "waiting"
 
