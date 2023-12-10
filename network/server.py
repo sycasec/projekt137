@@ -39,10 +39,14 @@ class myServer:
     def kill(self):
         self.serverRun = False
         self.server.close()
+
         for x in self.clientList:
             x.close()
+
         self.clientList = []
         self.connected_players = 0
+
+        self.serverLoop.join()
 
     def mainLoop(self):
         try:
