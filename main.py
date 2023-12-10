@@ -289,7 +289,11 @@ class KeyboardSplatoon():
                             self.host_address = None
 
                 elif self.active_screen == "rematch":
-                    self.client.send("GAME START".encode())
+                    # necessary. otherwise not synching if hosts initiate rematch
+                    if self.server != None:
+                        self.server.broadcast("GAME START".encode())
+                    else:
+                        self.client.send("GAME START".encode())
 
             pygame.display.update()
             GAME_CLOCK.tick(60)
