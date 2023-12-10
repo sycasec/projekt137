@@ -56,6 +56,9 @@ class KeyboardSplatoon():
         self.screen_handler = ScreenHandler(self.screen,WINDOW_WIDTH,WINDOW_HEIGHT,self.keys_font)
         self.active_screen = "splash"
         self.winner = None
+        
+        # self.active_screen = "gameover"
+        # self.winner = "RED"
 
         self.client_type = None
         self.host_address = None
@@ -227,7 +230,6 @@ class KeyboardSplatoon():
 
     def run(self):
         while True:
-            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -242,22 +244,18 @@ class KeyboardSplatoon():
                         except Exception as e:
                             print("Something went wrong when sending your keypress")
                     # --------------------------------- EXPERIMENTAL --------------------------------
-                if self.active_screen == "home":
-                    if not mixer.music.get_busy():
-                         mixer.music.set_volume(0.1)
-                         mixer.music.play(-1)
-                         mixer.music.set_pos(14)
+                if self.active_screen == "home":                   
                     self.active_screen = self.screen_handler.update_home(event)
 
                 # Handle entering of IP address for waiting client
-                if self.active_screen == "waiting" and self.client_type == "client":
-                    if event.type == pygame.KEYDOWN:
-                        self.screen_handler.update_waiting(event)
-
-                        if event.key == pygame.K_RETURN:
+                if self.active_screen == "waiting":
+                    if event.type in [pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN]:
+                        self.active_screen = self.screen_handler.update_waiting(event, self.client_type)
+                        
+                        if self.client_type == "client" and event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                             self.host_address = self.screen_handler.get_host()
                             print("Connecting to host", self.screen_handler.get_host())
-            
+                                        
             if self.active_screen == "quit":
                 print("Quitting game")
                 pygame.quit()
@@ -273,8 +271,7 @@ class KeyboardSplatoon():
             else:
                 kwargs = {}
                 if self.active_screen in ("about", "gameover"):
-                    kwargs.update({'event':event})
-                    mixer.music.stop()
+                    kwargs.update({'event': event})
                 if self.active_screen == "gameover":
                     kwargs.update({"winner":self.winner})
                     mixer.music.stop()
@@ -295,7 +292,7 @@ class KeyboardSplatoon():
                     kwargs.update({"color":self.color})
                     mixer.music.stop()
                 self.active_screen = self.screen_handler.switch_screen(self.active_screen, **kwargs)
-
+                
                 if self.active_screen == "host":
                     self.server = myServer()
                     self.client = GameClient(
@@ -304,6 +301,8 @@ class KeyboardSplatoon():
                         receive_game_state=self.decode_game_state,
                         begin_game=self.begin_game
                     )
+                    print("Initialized Server")
+                    print("Initialized Game Client")
                     self.active_screen = "waiting"
                     self.color = "GREEN"
                     self.client_type = "host"
@@ -329,6 +328,7 @@ class KeyboardSplatoon():
                                 begin_game=self.begin_game
                             )
                             self.is_client_initialized = True
+                            print("Initialized Game Client")
                         except:
                             self.host_address = None
 
@@ -338,9 +338,19 @@ class KeyboardSplatoon():
                         self.server.broadcast("GAME START".encode())
                     else:
                         self.client.send("GAME START".encode())
-                    
                 
-
+                elif self.active_screen == "home":
+                    self.host_address = None
+                    self.screen_handler.clear_loading_inputbox()
+                    self.is_client_initialized = False
+                    
+                    if self.server != None:
+                        self.server.kill()
+                        self.server = None
+                    
+                    if self.client != None:
+                        self.client = None
+                    
             pygame.display.update()
             GAME_CLOCK.tick(60)
 if __name__ == "__main__":
