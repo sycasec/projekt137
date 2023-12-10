@@ -46,10 +46,7 @@ class myServer:
             except:
                 pass
             self.server.close()
-
-        for x in self.clientList:
-            x.close()
-
+            
         self.clientList = []
         self.connected_players = 0
 
