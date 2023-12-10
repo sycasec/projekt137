@@ -70,7 +70,11 @@ class myServer:
                     self.broadcast("GAME START".encode())
                 elif self.status == "WAIT":
                     print("Waiting for client")
-                    conn, addr = self.server.accept()
+                    try:
+                        conn, addr = self.server.accept()
+                    except:
+                        pass
+
                     self.on_client_connect(conn, addr)
                 time.sleep(1)
 
@@ -80,7 +84,6 @@ class myServer:
             self.kill()
         finally:
             if self.server:
-                conn.close()
                 self.server.close()
 
     def clientHandler(self, conn, adr):
