@@ -40,15 +40,11 @@ class myServer:
     def kill(self):
         self.serverRun = False
         
-        if self.server.fileno() > 0:
-            try:
-                self.server.shutdown(socket.SHUT_RDWR)
-            except:
-                pass
-            self.server.close()
-
-        for x in self.clientList:
-            x.close()
+        try:
+            self.server.shutdown(socket.SHUT_RDWR)
+        except:
+            pass
+        self.server.close()
 
         self.clientList = []
         self.connected_players = 0
