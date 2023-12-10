@@ -2,8 +2,6 @@ import socket
 import threading
 import pickle
 import time
-import sys
-import select
 
 
 class myServer:

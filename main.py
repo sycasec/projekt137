@@ -89,6 +89,10 @@ class KeyboardSplatoon():
 
         self.countdown_channel = pygame.mixer.Channel(1)
 
+        #event constant
+        self.GAMESTART = "GAME START"
+        self.BACKHOME = "BACK TO HOME"
+
     def gameover_sound(self):
         self.timer_sound.stop()
         self.win_sound.play()
@@ -161,7 +165,7 @@ class KeyboardSplatoon():
         self.keys.set_key_colors_from_string(s)
 
     def event_listener(self,msg):
-        if msg == "GAME START":
+        if msg == self.GAMESTART:
             if self.server is not None:
                 self.keys.randomize_key_colors()
                 self.client.send(self.keys.get_key_colors().encode())
@@ -175,7 +179,7 @@ class KeyboardSplatoon():
             self.active_screen = "countdown"
             self.screen_handler.begin_countdown()
 
-        elif msg == "BACK TO HOME":
+        elif msg == self.BACKHOME:
             self.active_screen = "home"
             self.server = None
             self.client = None
@@ -341,9 +345,9 @@ class KeyboardSplatoon():
                 elif self.active_screen == "rematch":
                     # necessary. otherwise not synching if hosts initiate rematch
                     if self.server != None:
-                        self.server.broadcast("GAME START".encode())
+                        self.server.broadcast(self.GAMESTART.encode())
                     else:
-                        self.client.send("GAME START".encode())
+                        self.client.send(self.GAMESTART.encode())
 
                 elif self.active_screen == "home":
                     self.host_address = None
@@ -351,12 +355,12 @@ class KeyboardSplatoon():
                     self.is_client_initialized = False
 
                     if self.server != None:
-                        self.server.broadcast("BACK TO HOME".encode())
+                        self.server.broadcast(self.BACKHOME.encode())
                         self.server.kill()
 
 
                     if self.client != None:
-                        self.client.send("BACK TO HOME".encode())
+                        self.client.send(self.BACKHOME.encode())
                         self.client.kill()
 
             pygame.display.update()
