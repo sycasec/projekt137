@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
-import os
 import pygame
+import random
+import time
+import sys
 
 from pygame import mixer
 from components.keys import Key, KeyHelper
@@ -79,10 +81,10 @@ class KeyboardSplatoon():
         mixer.music.play(-1)
         mixer.music.set_pos(10.4)
 
-        self.combo_sound = pygame.mixer.Sound(os.path.join("assets", "sounds", "combo.wav"))
-        self.countdown_sound = pygame.mixer.Sound(os.path.join("assets", "sounds", "countdown.mp3"))
-        self.timer_sound = pygame.mixer.Sound(os.path.join("assets", "sounds", "gametimer.mp3"))
-        self.win_sound = pygame.mixer.Sound(os.path.join("assets", "sounds", "gameover.mp3"))
+        self.combo_sound = pygame.mixer.Sound("assets\sounds\combo.wav")
+        self.countdown_sound = pygame.mixer.Sound("assets\sounds\countdown.mp3")
+        self.timer_sound = pygame.mixer.Sound("assets\sounds\gametimer.mp3")
+        self.win_sound = pygame.mixer.Sound("assets\sounds\gameover.mp3")
 
         self.countdown_channel = pygame.mixer.Channel(1)
 
@@ -205,18 +207,25 @@ class KeyboardSplatoon():
             ):
             self.active_screen = "gameover"
             self.winner = "GREEN"
+            self.is_game_start = False
+            self.gameover_sound()
         elif all(
                 key.target_color == Key.key_red_color
                 for key in self.k_dict.values()
             ):
             self.active_screen = "gameover"
             self.winner = "RED"
+            self.is_game_start = False
+            self.gameover_sound()
         elif all(
                 key.target_color == Key.key_default_color
                 for key in self.k_dict.values()
             ):
             self.active_screen = "gameover"
             self.winner = "TIE"
+            self.is_game_start = False
+            self.gameover_sound()
+
 
     def run(self):
         while True:
@@ -324,7 +333,6 @@ class KeyboardSplatoon():
                             self.is_client_initialized = True
                         except:
                             self.host_address = None
-                        mixer.music.stop()
 
                 elif self.active_screen == "rematch":
                     # necessary. otherwise not synching if hosts initiate rematch
