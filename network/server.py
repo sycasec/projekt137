@@ -74,6 +74,7 @@ class myServer:
                         conn, addr = self.server.accept()
                     except:
                         pass
+
                     self.on_client_connect(conn, addr)
                 time.sleep(1)
 
