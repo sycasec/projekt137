@@ -38,6 +38,8 @@ class myServer:
         
     def kill(self):
         self.serverRun = False
+        
+        self.server.shutdown(socket.SHUT_RDWR)
         self.server.close()
         self.clientList = []
         self.connected_players = 0
