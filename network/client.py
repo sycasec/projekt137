@@ -21,14 +21,17 @@ class myClient:
                 
     def broadcast_receiver(self):
         while True:
-            s_msg_bin = self.s.recv(1024)
-
             try:
-                s_msg = s_msg_bin.decode()
-            except UnicodeDecodeError:
-                s_msg = pickle.loads(s_msg_bin)
+                s_msg_bin = self.s.recv(1024)
 
-            self.on_receive(s_msg)
+                try:
+                    s_msg = s_msg_bin.decode()
+                except UnicodeDecodeError:
+                    s_msg = pickle.loads(s_msg_bin)
+
+                self.on_receive(s_msg)
+            except:
+                pass
 
     def send(self, data):
         try:
