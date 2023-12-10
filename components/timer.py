@@ -13,11 +13,15 @@ class Timer:
         self.max_time = max_time
         self.current_time = max_time
         self.font = font
+        self.played_timer_sound = False
+        self.start_countdown = False
 
     def update(self, dt):
         self.current_time -= dt
         if self.current_time < 0:
             self.current_time = 0
+        if self.current_time <= 5 and self.current_time > 0:
+            self.start_countdown = True
 
     def reset(self):
         self.current_time = self.max_time

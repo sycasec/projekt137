@@ -82,7 +82,16 @@ class KeyboardSplatoon():
         mixer.music.play(-1)
         mixer.music.set_pos(10.4)
 
-        self.combo = pygame.mixer.Sound("assets\sounds\combo.wav")
+        self.combo_sound = pygame.mixer.Sound("assets\sounds\combo.wav")
+        self.countdown_sound = pygame.mixer.Sound("assets\sounds\countdown.mp3")
+        self.timer_sound = pygame.mixer.Sound("assets\sounds\gametimer.mp3")
+        self.win_sound = pygame.mixer.Sound("assets\sounds\gameover.mp3")
+
+        self.countdown_channel = pygame.mixer.Channel(1)
+
+    def gameover_sound(self):
+        self.timer_sound.stop()
+        self.win_sound.play()
         
     def encode_game_state(self, delimiter="$"):
         """Takes the current keyboard and player scores and encodes them in a delimited string
@@ -122,7 +131,8 @@ class KeyboardSplatoon():
             self.color == "RED" and self.moves == "RRR"
         ):
             self.multiplier += 1
-            self.combo.play()
+            self.combo_sound.set_volume(0.25)
+            self.combo_sound.play()
             self.moves = "DDD"
         elif (self.color == "GREEN" and new_key_color != "G") or (
             self.color == "RED" and new_key_color != "R"
@@ -170,6 +180,10 @@ class KeyboardSplatoon():
         self.timer_bar.update(dt)
         self.timer_bar.draw(self.screen)
         self.scores.draw(self.screen, self.color, self.multiplier)
+        
+        if self.timer_bar.start_countdown and not self.timer_bar.played_timer_sound:
+            self.countdown_channel.play(self.timer_sound)
+            self.timer_bar.played_timer_sound = True
 
         if self.timer_bar.is_done():
             winner = self.scores.publish_winner()
@@ -187,18 +201,22 @@ class KeyboardSplatoon():
             ):
             self.active_screen = "gameover"
             self.winner = "GREEN"
+            self.gameover_sound()
         elif all(
                 key.target_color == Key.key_red_color
                 for key in self.k_dict.values()
             ):
             self.active_screen = "gameover"
             self.winner = "RED"
+            self.gameover_sound()
         elif all(
                 key.target_color == Key.key_default_color
                 for key in self.k_dict.values()
             ):
             self.active_screen = "gameover"
             self.winner = "TIE"
+            self.gameover_sound()
+
 
     def run(self):
         while True:
@@ -240,7 +258,7 @@ class KeyboardSplatoon():
             
             if self.active_screen == "play":
                 if not mixer.music.get_busy():
-                        mixer.music.set_volume(0.5)
+                        mixer.music.set_volume(0.25)
                         mixer.music.play(-1)
                         mixer.music.set_pos(14)
                 self.play(event)
@@ -255,6 +273,8 @@ class KeyboardSplatoon():
                     mixer.music.stop()
                 if self.active_screen == "countdown":
                     kwargs.update({"color":self.color})
+                    self.countdown_sound.set_volume(0.25)
+                    self.countdown_sound.play()
                     mixer.music.stop()
                 if self.active_screen == "waiting":
                     kwargs.update({"client_type": self.client_type, 
