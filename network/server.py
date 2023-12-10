@@ -39,6 +39,8 @@ class myServer:
 
     def kill(self):
         self.serverRun = False
+        
+        self.server.shutdown(socket.SHUT_RDWR)
         self.server.close()
 
         for x in self.clientList:
