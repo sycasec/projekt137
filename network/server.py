@@ -99,12 +99,11 @@ class myServer:
                     c_msg = pickle.loads(c_msg_bin)
                 except:
                     pass
-                
+
                 print(f"message from {adr}: {c_msg}")
                 self.broadcast(c_msg_bin)
             except:
                 pass
-
 
     def on_client_connect(self, conn, addr):
         try:
