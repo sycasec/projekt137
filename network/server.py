@@ -3,6 +3,7 @@ import threading
 import pickle
 import time
 import sys
+import select
 
 class myServer:
 
@@ -46,7 +47,7 @@ class myServer:
         self.clientList = []
         self.connected_players = 0
 
-        self.serverLoop.join()
+        self.serverLoop.join(timeout=5)
 
     def mainLoop(self):
         try:
@@ -57,7 +58,9 @@ class myServer:
                     self.broadcast("GAME START".encode())
                 elif self.status == "WAIT":
                     print("Waiting for client")
-                    conn, addr = self.server.accept()
+                    rr,rw,err = select.select( [self.server],[],[], 20 )
+                    if rr:
+                        conn, addr = self.server.accept()
                     self.on_client_connect(conn, addr)
 
                 time.sleep(1)
