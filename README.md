@@ -9,13 +9,22 @@ CMSC 137 Final Project
 
 Keyboard Splatoon - connect via local network with your friends and play a 1v1 battle
 
-# Installation and Setup
-1. Run the following snippet to start the game server
-```python network/server.py```
-2. In a separate tab, run the following snippet to start the game on your machine
-```python main.py```
-3. On another machine, rune the following snippet to connect to the host server
-```python main.py```
+## Installation and Setup
+1. Ensure that you have [Python](https://www.python.org/downloads/) installed on your system
+2. Clone the repository to your local machine
+```
+git clone https://github.com/sycasec/projekt137 && cd projekt137
+```
+3. (OPTIONAL) Create and activate a virtual environment
+```
+python -m virtualenv venv && venv\scripts\activate
+```
+4. Install the project's dependencies 
+```
+pip install -r requirements.txt
+```
+4. On one machine, run `python main.py` to launch the game and press "Initialize Game"
+5. On another machine, repeat steps 1-4 and run `python main.py` to launch the game. Press "Join Game" and type the host's IP address
 
 ## Screenshots
 
