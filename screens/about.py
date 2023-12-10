@@ -36,7 +36,7 @@ class AboutScreen:
         self.about_text = """
             Keyboard Splatoon is a multiplayer keyboard-based game where players try 
             to “paint” the game’s keyboard in their color before the opponent can do 
-            the same 
+            the same.
 
             
             MECHANICS:
@@ -45,15 +45,18 @@ class AboutScreen:
             When a player presses a key, that key will toggle its color. 
 
             
-            WIN CONDITIONS/SCORING SYSTEM:
+            SCORING SYSTEM:
 
             Whenever a key turns into a player’s color, that player gets 10 points 
-            (i.e. if the green player turns a red key into green, they get 10 points). 
+            (i.e. if the green player turns a red key into green, green gets 10 points). 
+            Getting multiple keys correctly in a row increases a combo multiplier.
             Player 1’s goal is to make all keys green, and player 2’s goal is to make 
-            all keys red. If one player succeeds, they automatically win. If no player 
-            succeeds after 10 seconds, the player with the highest score wins. 
+            all keys red. 
+
+            WIN CONDITIONS:
+            
             If one player manages to cover the entire keyboard in their respective 
-            color, they immediately win. If no player succeeds in this after 10 seconds, 
+            color, they immediately win. If no player succeeds in this after the time limit, 
             the player with the highest score wins instead.
 
         """
