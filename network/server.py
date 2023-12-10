@@ -45,10 +45,9 @@ class myServer:
         except:
             pass
         self.server.close()
+        
         self.clientList = []
         self.connected_players = 0
-
-        self.serverLoop.join(timeout=5)
 
     def mainLoop(self):
         try:
