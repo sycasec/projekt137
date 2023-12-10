@@ -11,6 +11,8 @@ from components.screenhandler import ScreenHandler
 from components.score import ScoreHelper
 from network.client import GameClient
 from network.server import myServer
+from sys import exit
+
 WINDOW_WIDTH = 1125
 WINDOW_HEIGHT = 800
 FACTOR = 25
