@@ -1,3 +1,4 @@
+import os
 import pygame
 import random
 
@@ -21,7 +22,7 @@ class Key:
         self.target_color = start_color
         self.t_timer = 0
         self.font = t_font
-        self.key_press = pygame.mixer.Sound("assets\sounds\keypress.mp3")
+        self.key_press = pygame.mixer.Sound(os.path.join("assets", "sounds", "keypress.mp3"))
         
 
     def toggle_red(self):
