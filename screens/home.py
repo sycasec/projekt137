@@ -1,6 +1,6 @@
+import os
 import pygame
-import sys
-from pygame import mixer
+
 
 class HomeScreen:
     def __init__(self, screen_width, screen_height, font):
@@ -12,9 +12,9 @@ class HomeScreen:
         self.button_spacing = 40  
         self.title_spacing = 50 
         self.selected_button = 0
-        #self.bg_music = pygame.mixer.Sound('assets/sounds/bg.mp3')
-        self.button_click = pygame.mixer.Sound("assets/sounds/buttonclick.mp3")
-        self.button_nav = pygame.mixer.Sound("assets/sounds/buttonnav.mp3")
+        # self.bg_music = pygame.mixer.Sound(os.path.join("assets", "sounds", "bg.mp3")
+        self.button_click = pygame.mixer.Sound(os.path.join("assets", "sounds", "buttonclick.mp3"))
+        self.button_nav = pygame.mixer.Sound(os.path.join("assets", "sounds", "buttonnav.mp3"))
 
         self.title()
         self.menu()

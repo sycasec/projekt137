@@ -1,12 +1,14 @@
+import os
 import pygame
+
 
 class AboutScreen:
     def __init__(self, screen_width, screen_height, font):
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.font = font
-        self.button_click = pygame.mixer.Sound("assets/sounds/buttonclick.mp3")
-    
+        self.button_click = pygame.mixer.Sound(os.path.join("assets", "sounds", "buttonclick.mp3"))
+
         self.containers()
         self.fonts()
         self.text_content()
