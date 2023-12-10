@@ -16,14 +16,9 @@ class myServer:
         self.port=port
         self.serverRun = True
 
-        try:
-            #Functions to start the server and define listener
-            self.server.bind((self.host,self.port))
-            self.server.listen(1)
-        except:
-            self.port += 1
-            self.server.bind((self.host,self.port))
-            self.server.listen(1)
+        #Functions to start the server and define listener
+        self.server.bind((self.host,self.port))
+        self.server.listen(1)
 
         self.connected_players = 0
         self.status = "WAIT"
