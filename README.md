@@ -27,4 +27,8 @@ pip install -r requirements.txt
 5. On another machine, repeat steps 1-4 and run `python main.py` to launch the game. Press "Join Game" and type the host's IP address
 
 ## Screenshots
-
+![Main Menu](<screenshots/Screenshot from 2023-12-10 11-23-47.png>) 
+![Waiting Menu](<screenshots/Screenshot from 2023-12-10 11-25-47.png>) 
+![Countdown Screen](<screenshots/Screenshot from 2023-12-10 11-26-30.png>) 
+![Game Screen](<screenshots/Screenshot from 2023-12-10 11-26-44.png>) 
+![Game Over Screen](<screenshots/Screenshot from 2023-12-10 11-27-07.png>)
