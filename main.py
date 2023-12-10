@@ -205,25 +205,18 @@ class KeyboardSplatoon():
             ):
             self.active_screen = "gameover"
             self.winner = "GREEN"
-            self.is_game_start = False
-            self.gameover_sound()
         elif all(
                 key.target_color == Key.key_red_color
                 for key in self.k_dict.values()
             ):
             self.active_screen = "gameover"
             self.winner = "RED"
-            self.is_game_start = False
-            self.gameover_sound()
         elif all(
                 key.target_color == Key.key_default_color
                 for key in self.k_dict.values()
             ):
             self.active_screen = "gameover"
             self.winner = "TIE"
-            self.is_game_start = False
-            self.gameover_sound()
-
 
     def run(self):
         while True:
@@ -331,6 +324,7 @@ class KeyboardSplatoon():
                             self.is_client_initialized = True
                         except:
                             self.host_address = None
+                        mixer.music.stop()
 
                 elif self.active_screen == "rematch":
                     # necessary. otherwise not synching if hosts initiate rematch
