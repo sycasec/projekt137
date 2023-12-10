@@ -244,11 +244,7 @@ class KeyboardSplatoon():
                         except Exception as e:
                             print("Something went wrong when sending your keypress")
                     # --------------------------------- EXPERIMENTAL --------------------------------
-                if self.active_screen == "home":
-                    if not mixer.music.get_busy():
-                         mixer.music.set_volume(0.1)
-                         mixer.music.play(-1)
-                         mixer.music.set_pos(14)
+                if self.active_screen == "home":                   
                     self.active_screen = self.screen_handler.update_home(event)
 
                 # Handle entering of IP address for waiting client
@@ -275,8 +271,7 @@ class KeyboardSplatoon():
             else:
                 kwargs = {}
                 if self.active_screen in ("about", "gameover"):
-                    kwargs.update({'event':event})
-                    mixer.music.stop()
+                    kwargs.update({'event': event})
                 if self.active_screen == "gameover":
                     kwargs.update({"winner":self.winner})
                     mixer.music.stop()
