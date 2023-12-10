@@ -41,7 +41,10 @@ class myServer:
         self.serverRun = False
         
         if self.server.fileno() > 0:
-            self.server.shutdown(socket.SHUT_RDWR)
+            try:
+                self.server.shutdown(socket.SHUT_RDWR)
+            except:
+                pass
             self.server.close()
 
         for x in self.clientList:
@@ -81,18 +84,22 @@ class myServer:
 
     def clientHandler(self, conn, adr):
         while self.serverRun:
-            c_msg_bin = conn.recv(1024)
             try:
-                # Decode string
-                c_msg = c_msg_bin.decode()
-            except UnicodeDecodeError:
-                # Decode data object
-                c_msg = pickle.loads(c_msg_bin)
+                c_msg_bin = conn.recv(1024)
+                try:
+                    # Decode string
+                    c_msg = c_msg_bin.decode()
+                except UnicodeDecodeError:
+                    # Decode data object
+                    c_msg = pickle.loads(c_msg_bin)
+                except:
+                    pass
+                
+                print(f"message from {adr}: {c_msg}")
+                self.broadcast(c_msg_bin)
             except:
                 pass
 
-            print(f"message from {adr}: {c_msg}")
-            self.broadcast(c_msg_bin)
 
     def on_client_connect(self, conn, addr):
         try:
