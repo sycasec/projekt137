@@ -24,6 +24,8 @@ class Waiting:
                                      18,
                                      self.ip_address_text_font)
         
+        self.back_button_rect = pygame.Rect(20, 20, 100, 40)
+        
 
     def title(self):
         self.title_font = pygame.font.Font(pygame.font.get_default_font(), self.title_font_size)
@@ -64,22 +66,24 @@ class Waiting:
         self.square_change_interval = 120 
         self.bounce_directions = [1, -1, 1] 
 
-    def handle_event(self, event):
-        self.ip_input_box.handle_event(event)
+    def handle_event(self, event, client_type):
+        if event.type == pygame.KEYDOWN and client_type == "client":
+            self.ip_input_box.handle_event(event)
+            return "waiting"
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.back_button_rect.colliderect(pygame.Rect(event.pos, (1, 1))):
+            return "home"
+        else:
+            return "waiting"
+
         
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                return "assignment"
         
+    def clear_inputbox(self):
+        self.ip_input_box.clear_text()
         
     def get_final_ip(self):
         if self.ip_input_box.final_text != '':
             return self.ip_input_box.final_text
         return None
-        
 
     def update(self):
         self.square_change_interval -= 1
@@ -93,7 +97,17 @@ class Waiting:
 
             if square.width > 36 or square.width < 10:  # Adjusted the conditions
                 self.bounce_directions[i] *= -1
-    
+                
+    def back_button(self, screen):
+        button_font = pygame.font.Font(pygame.font.get_default_font(), 20)
+        
+        back_button_text = button_font.render("Back", True, "Black")
+        
+        text_x = self.back_button_rect.x + (self.back_button_rect.width - back_button_text.get_width()) // 2
+        text_y = self.back_button_rect.y + (self.back_button_rect.height - back_button_text.get_height()) // 2
+        
+        pygame.draw.rect(screen, (217, 217, 217), self.back_button_rect, border_radius=10)
+        screen.blit(back_button_text, (text_x, text_y))
     
     def render(self, screen, client_type, ip_address):
         self.ip_address_display(client_type, ip_address)
@@ -116,5 +130,7 @@ class Waiting:
 
         for i, square in enumerate(self.squares):
             pygame.draw.rect(screen, (217, 217, 217), square, border_radius=5)
+            
+        self.back_button(screen)
 
         pygame.display.flip()

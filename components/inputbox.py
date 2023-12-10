@@ -14,15 +14,17 @@ class InputBox:
         self.final_text = ""
 
     def handle_event(self, event):
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RETURN:
-                self.final_text = self.text
-            elif event.key == pygame.K_BACKSPACE:
-                self.text = self.text[:-1]
-            else:
-                self.text += event.unicode
+        if event.key == pygame.K_RETURN:
+            self.final_text = self.text
+        elif event.key == pygame.K_BACKSPACE:
+            self.text = self.text[:-1]
+        else:
+            self.text += event.unicode
         self.text_surface = self.text_font.render(self.text, True, self.color)
 
+    def clear_text(self):
+        self.text = ""
+        
     def update(self):
         # Resize the box if the text is too long.
         width = max(200, self.text_surface.get_width()+10)

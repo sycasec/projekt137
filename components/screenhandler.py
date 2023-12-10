@@ -61,8 +61,8 @@ class ScreenHandler():
 
         return self.home()
     
-    def update_waiting(self, event):
-        self.waiting_screen.handle_event(event)
+    def update_waiting(self, event, client_type):
+        return self.waiting_screen.handle_event(event, client_type)
         
     def get_host(self):
         return self.waiting_screen.get_final_ip()
@@ -88,8 +88,8 @@ class ScreenHandler():
         return "join"
 
     def waiting(self, client_type, ip_address):
+
         self.waiting_screen.ip_address_display(client_type, ip_address)
-        
         self.waiting_screen.update()
         self.waiting_screen.render(self.screen, client_type, ip_address)
             
@@ -110,4 +110,9 @@ class ScreenHandler():
         result = self.gameover_screen.handle_event(event)
         if result == "rematch":
             return "rematch"
+        elif result == "home":
+            return "home"
         return "gameover"
+    
+    def clear_loading_inputbox(self):
+        self.waiting_screen.clear_inputbox()
