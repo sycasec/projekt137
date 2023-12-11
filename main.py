@@ -186,6 +186,15 @@ class KeyboardSplatoon():
             self.server = None
             self.client = None
 
+    def shutdown(self,pygame:pygame):
+        if self.server != None:
+            self.server.kill()
+
+        if self.client != None:
+            self.client.kill()
+        pygame.quit()
+        exit()
+
     #Main Play
     def play(self, event):
 
@@ -244,8 +253,7 @@ class KeyboardSplatoon():
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
+                    self.shutdown(pygame)
 
                 elif event.type == pygame.KEYDOWN:
                     # --------------------------------- EXPERIMENTAL --------------------------------
@@ -270,8 +278,7 @@ class KeyboardSplatoon():
 
             if self.active_screen == "quit":
                 print("Quitting game")
-                pygame.quit()
-                exit()
+                self.shutdown(pygame)
 
             if self.active_screen == "play":
                 if not mixer.music.get_busy():
