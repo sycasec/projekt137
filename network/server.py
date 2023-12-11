@@ -87,21 +87,27 @@ class myServer:
                 self.server.close()
 
     def clientHandler(self, conn, adr):
-        while self.serverRun:
-            try:
-                c_msg_bin = conn.recv(1024)
+        try:
+            while self.serverRun:
                 try:
-                    # Decode string
-                    c_msg = c_msg_bin.decode()
-                except UnicodeDecodeError:
-                    # Decode data object
-                    c_msg = pickle.loads(c_msg_bin)
+                    c_msg_bin = conn.recv(1024)
+                    if not c_msg_bin:
+                        break  # Break out of the loop when the client disconnects
+
+                    try:
+                        # Decode string
+                        c_msg = c_msg_bin.decode()
+                    except UnicodeDecodeError:
+                        # Decode data object
+                        c_msg = pickle.loads(c_msg_bin)
+
+                    print(f"message from {adr}: {c_msg}")
+                    self.broadcast(c_msg_bin)
                 except:
-                    pass
-                print(f"message from {adr}: {c_msg}")
-                self.broadcast(c_msg_bin)
-            except:
-                pass
+                    break  # Break out of the loop when an exception occurs (e.g., client disconnects)
+        finally:
+            print("Client disconnected. Destroying server")
+            self.kill()
 
     def on_client_connect(self, conn, addr):
         try:
