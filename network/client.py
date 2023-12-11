@@ -25,6 +25,11 @@ class myClient:
             try:
                 s_msg_bin = self.s.recv(1024)
 
+                if not s_msg_bin:
+                    print("Server disconnected. Exiting.")
+                    self.kill()
+                    return
+
                 try:
                     s_msg = s_msg_bin.decode()
                 except UnicodeDecodeError:
