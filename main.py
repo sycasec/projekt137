@@ -12,6 +12,8 @@ from components.score import ScoreHelper
 from network.client import GameClient
 from network.server import myServer
 
+from sys import exit
+
 WINDOW_WIDTH = 1125
 WINDOW_HEIGHT = 800
 FACTOR = 25
@@ -25,7 +27,7 @@ class KeyboardSplatoon():
 
         pygame.display.set_caption(WINDOW_TITLE)
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-        
+
         # logo
         img = pygame.image.load('assets/logo.png')
         pygame.display.set_icon(img)
@@ -186,7 +188,7 @@ class KeyboardSplatoon():
 
         elif msg == self.BACKHOME:
             self.on_drop_connection()
-            
+
     def on_drop_connection(self):
         self.is_game_start = False
         self.active_screen = "home"
