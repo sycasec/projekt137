@@ -54,7 +54,7 @@ class KeyboardSplatoon():
 
         #Scren handler
         self.screen_handler = ScreenHandler(self.screen,WINDOW_WIDTH,WINDOW_HEIGHT,self.keys_font)
-        self.active_screen = "splash"
+        self.active_screen = "home"
         self.winner = None
 
         # self.active_screen = "gameover"
@@ -180,13 +180,16 @@ class KeyboardSplatoon():
             self.screen_handler.begin_countdown()
 
         elif msg == self.BACKHOME:
-            self.active_screen = "home"
-            if self.server is not None:
-                self.server.kill()
-                self.server = None
-            if self.client is not None:
-                self.client.kill()
-                self.client = None
+            self.on_drop_connection()
+            
+    def on_drop_connection(self):
+        self.active_screen = "home"
+        if self.server is not None:
+            self.server.kill()
+            self.server = None
+        if self.client is not None:
+            self.client.kill()
+            self.client = None
 
     #Main Play
     def play(self, event):
@@ -309,12 +312,13 @@ class KeyboardSplatoon():
 
                 if self.active_screen == "host":
                     if self.server is None:
-                        self.server = myServer()
+                        self.server = myServer(on_drop_connection=self.on_drop_connection)
                     self.client = GameClient(
                         receive_keypress=self.receive_keypress,
                         receive_keyboard_state=self.receive_keyboard_state,
                         receive_game_state=self.decode_game_state,
-                        event_listener=self.event_listener
+                        event_listener=self.event_listener,
+                        on_drop_connection=self.on_drop_connection,
                     )
                     print("Initialized Server")
                     print("Initialized Game Client")
@@ -340,7 +344,8 @@ class KeyboardSplatoon():
                                 receive_keypress=self.receive_keypress,
                                 receive_keyboard_state=self.receive_keyboard_state,
                                 receive_game_state=self.decode_game_state,
-                                event_listener=self.event_listener
+                                event_listener=self.event_listener,
+                                on_drop_connection=self.on_drop_connection,
                             )
                             self.is_client_initialized = True
                             print("Initialized Game Client")

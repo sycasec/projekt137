@@ -5,7 +5,8 @@ import time
 
 
 class myServer:
-    def __init__(self, host="0.0.0.0", port=7634):
+    def __init__(self, on_drop_connection=None, host="0.0.0.0", port=7634):
+        self.on_drop_connection = on_drop_connection
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # Prevent OSError: [Errno 98] Address already in use
         self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -92,7 +93,7 @@ class myServer:
                 c_msg_bin = conn.recv(1024)
                 if not c_msg_bin:
                     print("Client disconnected. Destroying server")
-                    self.kill()
+                    self.on_drop_connection()
                     break  # Break out of the loop when the client disconnects
 
                 try:

@@ -27,7 +27,7 @@ class myClient:
 
                 if not s_msg_bin:
                     print("Server disconnected. Exiting.")
-                    self.kill()
+                    self.on_drop_connection()
                     return
 
                 try:
@@ -56,10 +56,12 @@ class GameClient(myClient):
                  receive_keyboard_state,
                  receive_game_state,
                  event_listener,
+                 on_drop_connection=None,
                  host="localhost",
                  port=7634,
                  on_receive=None
                  ):
+        self.on_drop_connection = on_drop_connection
         self.receive_keypress = receive_keypress
         self.receive_keyboard_state = receive_keyboard_state
         self.receive_game_state = receive_game_state
