@@ -25,6 +25,11 @@ class myClient:
             try:
                 s_msg_bin = self.s.recv(1024)
 
+                if not s_msg_bin:
+                    print("Server disconnected. Exiting.")
+                    self.on_drop_connection()
+                    return
+
                 try:
                     s_msg = s_msg_bin.decode()
                 except UnicodeDecodeError:
@@ -43,7 +48,7 @@ class myClient:
 
     def kill(self):
         self.run = False
-        self.t_receive.join(timeout=5)
+        # self.t_receive.join(timeout=5)
 
 class GameClient(myClient):
     def __init__(self,
@@ -51,10 +56,12 @@ class GameClient(myClient):
                  receive_keyboard_state,
                  receive_game_state,
                  event_listener,
+                 on_drop_connection=None,
                  host="localhost",
                  port=7634,
                  on_receive=None
                  ):
+        self.on_drop_connection = on_drop_connection
         self.receive_keypress = receive_keypress
         self.receive_keyboard_state = receive_keyboard_state
         self.receive_game_state = receive_game_state

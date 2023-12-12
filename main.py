@@ -180,8 +180,16 @@ class KeyboardSplatoon():
             self.screen_handler.begin_countdown()
 
         elif msg == self.BACKHOME:
-            self.active_screen = "home"
+            self.on_drop_connection()
+            
+    def on_drop_connection(self):
+        self.is_game_start = False
+        self.active_screen = "home"
+        if self.server is not None:
+            self.server.kill()
             self.server = None
+        if self.client is not None:
+            self.client.kill()
             self.client = None
 
     #Main Play
@@ -304,12 +312,14 @@ class KeyboardSplatoon():
                 self.active_screen = self.screen_handler.switch_screen(self.active_screen, **kwargs)
 
                 if self.active_screen == "host":
-                    self.server = myServer()
+                    if self.server is None:
+                        self.server = myServer(on_drop_connection=self.on_drop_connection)
                     self.client = GameClient(
                         receive_keypress=self.receive_keypress,
                         receive_keyboard_state=self.receive_keyboard_state,
                         receive_game_state=self.decode_game_state,
-                        event_listener=self.event_listener
+                        event_listener=self.event_listener,
+                        on_drop_connection=self.on_drop_connection,
                     )
                     print("Initialized Server")
                     print("Initialized Game Client")
@@ -335,7 +345,8 @@ class KeyboardSplatoon():
                                 receive_keypress=self.receive_keypress,
                                 receive_keyboard_state=self.receive_keyboard_state,
                                 receive_game_state=self.decode_game_state,
-                                event_listener=self.event_listener
+                                event_listener=self.event_listener,
+                                on_drop_connection=self.on_drop_connection,
                             )
                             self.is_client_initialized = True
                             print("Initialized Game Client")
@@ -354,14 +365,10 @@ class KeyboardSplatoon():
                     self.screen_handler.clear_loading_inputbox()
                     self.is_client_initialized = False
 
-                    if self.server != None:
+                    if self.server is not None:
                         self.server.broadcast(self.BACKHOME.encode())
-                        self.server.kill()
-
-
-                    if self.client != None:
+                    if self.client is not None:
                         self.client.send(self.BACKHOME.encode())
-                        self.client.kill()
 
             pygame.display.update()
             GAME_CLOCK.tick(60)
