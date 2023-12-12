@@ -183,6 +183,7 @@ class KeyboardSplatoon():
             self.on_drop_connection()
             
     def on_drop_connection(self):
+        self.is_game_start = False
         self.active_screen = "home"
         if self.server is not None:
             self.server.kill()
