@@ -26,7 +26,7 @@ class KeyboardSplatoon():
         pygame.init()
 
         pygame.display.set_caption(WINDOW_TITLE)
-        self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+        self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT),pygame.FULLSCREEN)
 
         # logo
         img = pygame.image.load('assets/logo.png')
