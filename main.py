@@ -181,8 +181,12 @@ class KeyboardSplatoon():
 
         elif msg == self.BACKHOME:
             self.active_screen = "home"
-            self.server = None
-            self.client = None
+            if self.server is not None:
+                self.server.kill()
+                self.server = None
+            if self.client is not None:
+                self.client.kill()
+                self.client = None
 
     #Main Play
     def play(self, event):
@@ -304,7 +308,8 @@ class KeyboardSplatoon():
                 self.active_screen = self.screen_handler.switch_screen(self.active_screen, **kwargs)
 
                 if self.active_screen == "host":
-                    self.server = myServer()
+                    if self.server is None:
+                        self.server = myServer()
                     self.client = GameClient(
                         receive_keypress=self.receive_keypress,
                         receive_keyboard_state=self.receive_keyboard_state,
@@ -354,14 +359,10 @@ class KeyboardSplatoon():
                     self.screen_handler.clear_loading_inputbox()
                     self.is_client_initialized = False
 
-                    if self.server != None:
+                    if self.server is not None:
                         self.server.broadcast(self.BACKHOME.encode())
-                        self.server.kill()
-
-
-                    if self.client != None:
+                    if self.client is not None:
                         self.client.send(self.BACKHOME.encode())
-                        self.client.kill()
 
             pygame.display.update()
             GAME_CLOCK.tick(60)

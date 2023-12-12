@@ -48,7 +48,7 @@ class myClient:
 
     def kill(self):
         self.run = False
-        self.t_receive.join(timeout=5)
+        # self.t_receive.join(timeout=5)
 
 class GameClient(myClient):
     def __init__(self,
