@@ -106,8 +106,9 @@ class myServer:
                 print(f"message from {adr}: {c_msg}")
                 self.broadcast(c_msg_bin)
             except Exception as e:
-                raise e
-                break  # Break out of the loop when an exception occurs (e.g., client disconnects)
+                print("Client disconnected. Destroying server")
+                self.on_drop_connection()
+                break  # Break out of the loop when the client disconnects
 
     def on_client_connect(self, conn, addr):
         try:
@@ -126,8 +127,10 @@ class myServer:
 
     def broadcast(self, message):
         for conn in self.clientList:
-            conn.send(message)
-
+            try:
+                conn.send(message)
+            except:
+                break
 
 if __name__ == "__main__":
     myServer()

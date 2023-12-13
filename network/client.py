@@ -41,10 +41,15 @@ class myClient:
 
     def send(self, data):
         try:
-            to_send = data.encode()
-        except AttributeError:
-            to_send = pickle.dumps(data)
-        self.s.send(to_send)
+            if isinstance(data,str):
+                to_send = data.encode()
+            else:
+                to_send = pickle.dumps(data)
+            self.s.send(to_send)
+        except Exception as e:
+            print("Server disconnected. Exiting.")
+            self.on_drop_connection()
+            return
 
     def kill(self):
         self.run = False
